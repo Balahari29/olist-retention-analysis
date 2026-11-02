@@ -1,0 +1,17 @@
+item,value
+orders (raw),99441
+v_orders_valid rows,97905
+v_orders_valid distinct order_id,97905
+v_orders_valid orders with 0 items,0
+valid delivered orders in window,96211
+  removed: no delivered date,8
+  removed: estimated date after last purchase date,2
+v_order_delivery rows,96201
+v_order_delivery flagged pick-up before approval,1350
+order_reviews (raw),99224
+v_order_reviews_dedup rows,98673
+v_order_reviews_dedup distinct order_id,98673
+v_order_reviews_dedup distinct review_id,98095
+v_geo_by_zip zip prefixes,19010
+v_product_category rows,32951
+v_product_category unknown,610

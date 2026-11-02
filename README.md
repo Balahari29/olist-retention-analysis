@@ -22,6 +22,7 @@ cp .env.example .env                                                   # then fi
 kaggle datasets download -d olistbr/brazilian-ecommerce -p data/raw --unzip
 .venv/bin/python src/load_to_mysql.py    # runs sql/01_schema.sql, loads 9 CSVs, writes outputs/row_counts.csv
 .venv/bin/python src/run_dq_checks.py    # runs sql/02_data_quality_checks.sql, writes outputs/dq_*.csv
+.venv/bin/python src/run_analysis.py     # runs sql/03_clean_layer.sql ... 06_views_for_powerbi.sql, writes outputs/
 ```
 Environment used: Python 3.12, MySQL 8.4 LTS (Homebrew `mysql@8.4`; any MySQL 8.0+ works, since window functions are required).
 
@@ -69,29 +70,38 @@ fields. Always count rows with a CSV parser, not `wc -l`.
 | PM | Process-map step order | 0 approvals before purchase; 0 estimated dates before purchase; **1,359 carrier pick-ups dated before approval**; 23 deliveries before carrier pick-up; 8,849 of 97,657 orders picked up after the seller's shipping limit | `outputs/dq_process_map_timestamps.csv` |
 | PM | Survey timing (step 9) | 88,837 of 99,224 surveys created the same or next day after delivery; 5,127 before delivery (4,713 of them on/after the estimated date); 2,865 for orders with no delivered date | `outputs/dq_review_timing.csv` |
 
-## Proposed rules (PROPOSED, not yet applied; awaiting review)
-**1. Valid order statuses**
-- *Revenue, AOV, repeat customers, cohorts:* `order_status IN ('delivered','shipped','invoiced','processing','approved')`.
-  Excludes `canceled` and `unavailable` (no completed sale; most unavailable orders have no items) and `created`
-  (5 orders: no approval and no items). Shipped/invoiced/processing orders are real purchases still in progress.
-- *Delivery KPIs and the review-vs-delay test:* `order_status = 'delivered' AND order_delivered_customer_date IS NOT NULL`
-  (excludes the 8 delivered orders without a date and the 6 canceled orders that have one).
+## Data rules (accepted 2026-11-02, applied in `sql/03_clean_layer.sql`)
+**Rule 1: Valid orders** (view `v_orders_valid`)
+- `order_status IN ('delivered','shipped','invoiced','processing','approved')`. Excludes `canceled` and `unavailable`
+  (no completed sale; most unavailable orders have no items) and `created` (5 orders: no approval and no items).
+- Purchases from 2017-01-01 to 2018-08-31 only (Rule 3). Applying the window here means every KPI
+  (revenue, retention, delivery) uses the same set of orders.
 
-**2. Duplicate reviews**
-- *One order, several reviews (547 orders):* keep the review with the latest `review_answer_timestamp`
-  (answer times always differ, so this never ties; `review_id` as a tie-breaker anyway). This is the customer's final opinion.
-- *One review, several orders (789 reviews):* keep the review on **each** linked order. All of these belong to one
-  customer, mostly for orders bought the same day, so it is one survey covering one basket. Delay and review are
-  compared at order level, so each order needs its own score.
+**Rule 2: Duplicate reviews** (view `v_order_reviews_dedup`)
+- One order, several reviews (547 orders): keep the review with the latest `review_answer_timestamp`
+  (`review_id` as tie-breaker). This is the customer's final opinion.
+- One review, several orders (789 reviews): the review stays on **each** linked order, so order-level delivery
+  can be compared with a score. The view carries `orders_sharing_review` for this.
+- **Phase 4 hypothesis test: one row per `review_id`**, so a single survey answer covering several orders is not
+  counted several times (that would inflate the sample size and make the p-value look stronger than it is).
 
-**3. Analysis date window**
-- *Trends and cohorts:* purchases from **2017-01-01 to 2018-08-31** (20 complete months). 2016 is excluded because it
-  has only 329 orders and no orders at all in 2016-11 (a gap breaks month-over-month and cohort sequences);
-  2018-09 and 2018-10 are excluded because they contain 20 orders and none were delivered.
-- *Cohort caveat:* later cohorts have less time to come back (the 2018-08 cohort can only show month 0), so
-  retention for month *k* is shown only for cohorts observed for at least *k* months.
-- *Delivery caveat:* recent months still have undelivered orders (e.g. 70 in progress in 2018-08), so their
-  on-time rates are based only on orders already delivered.
+**Rule 3: Analysis window and observation windows**
+- Trends, cohorts and all KPIs: purchases **2017-01-01 to 2018-08-31** (20 complete months). 2016 is excluded
+  (329 orders, no orders in 2016-11); 2018-09/10 are excluded (20 orders, none delivered).
+  Source: `outputs/dq_orders_per_month.csv`.
+- **Delivery KPIs** (view `v_order_delivery`): `order_status = 'delivered'`, a non-NULL delivered date, **and an
+  estimated delivery date on or before the dataset's last purchase date** (`MAX(order_purchase_timestamp)` over
+  all orders, 2018-10-17). Orders whose deadline falls after the data ends cannot yet be late, so including them
+  would bias late rates downwards.
+- **Cohorts:** retention month *k* is reported only for cohorts observed for at least *k* months, and cohorts are
+  compared on an **equal observation window** (repeat purchase within months 1-6 after the first order,
+  only for cohorts with 6 full months of follow-up).
 
-**Other proposed handling (Phase 3/4):** products with no category → `'unknown'`; add English names for the 2
-untranslated categories; drop the 42 out-of-Brazil geolocation rows, then average lat/lng per zip before joining.
+**Rule 4: Timestamp anomalies** (view `v_order_delivery`)
+- Orders whose carrier pick-up is dated before payment approval (1,359 in all orders, see
+  `outputs/dq_process_map_timestamps.csv`) are **flagged** (`flag_pickup_before_approval = 1`), not dropped.
+- They are excluded **only** from approval-to-pick-up timing (`approval_to_pickup_days` is NULL for them) and stay
+  in every other KPI.
+
+**Category names** (view `v_product_category`): English name from `category_translation`; the 2 untranslated
+categories keep their Portuguese name; products with no category become `'unknown'`.
