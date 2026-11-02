@@ -267,3 +267,18 @@ SELECT
     (SELECT SUM(is_late) FROM v_order_delivery)                 AS platform_late_orders,
     (SELECT COUNT(*)     FROM v_order_delivery)                 AS platform_delivered_orders
 FROM v_seller_scorecard;
+
+-- -------------------------------------------------------------------------------------
+-- Excess late orders summary (insight memo, recommendation 2): how many sellers are worse than
+-- an average seller of their size, and how many excess late orders they and the top 20 account for.
+-- -------------------------------------------------------------------------------------
+-- @output: seller_excess_summary
+SELECT
+    COUNT(*)                                                             AS ranked_sellers,
+    SUM(late_orders)                                                     AS ranked_late_orders,
+    SUM(excess_late_orders > 0)                                          AS sellers_with_positive_excess,
+    ROUND(SUM(CASE WHEN excess_late_orders > 0 THEN excess_late_orders END), 2) AS positive_excess_late_orders,
+    SUM(CASE WHEN excess_late_rank <= 20 THEN late_orders END)           AS top20_late_orders,
+    SUM(CASE WHEN excess_late_rank <= 20 THEN delivered_orders END)      AS top20_delivered_orders,
+    ROUND(SUM(CASE WHEN excess_late_rank <= 20 THEN excess_late_orders END), 2) AS top20_excess_late_orders
+FROM v_seller_late_rate;
