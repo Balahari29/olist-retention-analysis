@@ -1,0 +1,18 @@
+measure,filter_context,expected_value
+Total Revenue (R$),all valid orders 2017-01 to 2018-08,13449529.68
+Orders,all,97905.0
+AOV (R$),all,137.3733
+Customers,all (distinct customer_unique_id),94703.0
+Repeat Customer %,all,3.0348
+Delivered Orders (in scope),all,96201.0
+On-Time %,all,93.2111
+Late %,all,6.7889
+Avg Delay (days),all (negative = early),-11.8071
+Avg Delivery Days,all,12.4768
+Avg Review,all valid orders with a review,4.1173
+Avg Review (delivered),orders in delivery scope with a review,4.1563
+Revenue MoM %,month = 2018-08 (vs 2018-07),-3.3238
+Revenue MoM %,month = 2017-11 (vs 2017-10),52.0589
+Excess Late Orders,sellers with 30+ delivered orders (is_ranked_30plus_orders = 1),-45.41
+Excess Late Orders,top seller by excess (rank 1),51.7
+Seller Late %,sellers with 30+ delivered orders (seller-order pairs),6.7331

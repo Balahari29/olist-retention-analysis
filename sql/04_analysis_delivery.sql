@@ -112,3 +112,21 @@ FROM v_order_delivery
 WHERE purchase_month = '2017-11-01'
 GROUP BY purchase_period
 ORDER BY purchase_period;
+
+-- -------------------------------------------------------------------------------------
+-- Late % by product category (US-04). An order is counted once per category it contains.
+-- has_100plus_orders: small categories can top the list by chance, so titles use only flagged rows.
+-- -------------------------------------------------------------------------------------
+-- @output: delivery_late_by_category
+SELECT
+    pc.category_english,
+    COUNT(DISTINCT d.order_id)                                                       AS delivered_orders,
+    COUNT(DISTINCT CASE WHEN d.is_late = 1 THEN d.order_id END)                      AS late_orders,
+    ROUND(100 * CAST(COUNT(DISTINCT CASE WHEN d.is_late = 1 THEN d.order_id END) AS DOUBLE)
+              / COUNT(DISTINCT d.order_id), 2)                                       AS late_pct,
+    (COUNT(DISTINCT d.order_id) >= 100)                                              AS has_100plus_orders
+FROM v_order_delivery AS d
+JOIN order_items        AS i  ON i.order_id    = d.order_id
+JOIN v_product_category AS pc ON pc.product_id = i.product_id
+GROUP BY pc.category_english
+ORDER BY late_pct DESC;

@@ -7,14 +7,16 @@
 USE olist;
 
 -- -------------------------------------------------------------------------------------
--- dim_date: one row per day from the first purchase to the last delivered/estimated date
--- (recursive CTE; ~700 days, below MySQL's default recursion limit of 1000)
+-- dim_date: one row per day, whole calendar years from 1 Jan of the first purchase year to 31 Dec of the
+-- last delivered/estimated year (Power BI time intelligence expects complete years).
+-- Recursive CTE: 730 days, below MySQL's default recursion limit of 1000.
 -- -------------------------------------------------------------------------------------
 CREATE OR REPLACE VIEW dim_date AS
 WITH RECURSIVE calendar AS (
     SELECT bounds.first_date AS date_key, bounds.last_date
-    FROM (SELECT MIN(purchase_date) AS first_date,
-                 GREATEST(MAX(DATE(order_delivered_customer_date)), MAX(DATE(order_estimated_delivery_date))) AS last_date
+    FROM (SELECT MAKEDATE(YEAR(MIN(purchase_date)), 1) AS first_date,
+                 MAKEDATE(YEAR(GREATEST(MAX(DATE(order_delivered_customer_date)),
+                                        MAX(DATE(order_estimated_delivery_date)))) + 1, 1) - INTERVAL 1 DAY AS last_date
             FROM v_orders_valid) AS bounds
     UNION ALL
     SELECT date_key + INTERVAL 1 DAY, last_date
@@ -172,3 +174,62 @@ UNION ALL SELECT 'fact_order_items products missing from dim_product',
                  COUNT(*) FROM fact_order_items WHERE product_id NOT IN (SELECT product_id FROM dim_product)
 UNION ALL SELECT 'fact_orders dates missing from dim_date',
                  COUNT(*) FROM fact_orders WHERE purchase_date NOT IN (SELECT date_key FROM dim_date);
+
+-- -------------------------------------------------------------------------------------
+-- Expected values for every DAX measure (powerbi/dax_measures.md), computed from the SAME views
+-- Power BI loads, at full (DOUBLE) precision. This is the UAT baseline for Phase 7.
+-- -------------------------------------------------------------------------------------
+-- @output: powerbi_expected_values
+WITH
+order_totals AS (
+    SELECT SUM(order_revenue) AS revenue, COUNT(*) AS orders,
+           SUM(in_delivery_scope) AS delivered_in_scope, SUM(is_on_time) AS on_time, SUM(is_late) AS late,
+           AVG(CAST(delay_days AS DOUBLE)) AS avg_delay, AVG(CAST(delivery_days AS DOUBLE)) AS avg_delivery_days,
+           AVG(CAST(review_score AS DOUBLE)) AS avg_review_all,
+           AVG(CASE WHEN in_delivery_scope = 1 THEN CAST(review_score AS DOUBLE) END) AS avg_review_delivered
+    FROM fact_orders
+),
+person_orders AS (
+    SELECT c.customer_unique_id, COUNT(*) AS orders
+    FROM fact_orders AS f JOIN dim_customer AS c ON c.customer_id = f.customer_id
+    GROUP BY c.customer_unique_id
+),
+monthly_revenue AS (
+    SELECT DATE_FORMAT(purchase_date, '%Y-%m') AS month_label, SUM(order_revenue) AS revenue
+    FROM fact_orders GROUP BY month_label
+),
+seller_pairs AS (                   -- seller-order pairs in delivery scope, as in fact_order_items
+    SELECT DISTINCT seller_id, order_id, is_late
+    FROM fact_order_items
+    WHERE in_delivery_scope = 1
+),
+seller_excess AS (
+    SELECT p.seller_id, s.is_ranked_30plus_orders,
+           SUM(p.is_late) - COUNT(*) * (SELECT CAST(late AS DOUBLE) / delivered_in_scope FROM order_totals) AS excess
+    FROM seller_pairs AS p JOIN dim_seller AS s ON s.seller_id = p.seller_id
+    GROUP BY p.seller_id, s.is_ranked_30plus_orders
+)
+SELECT 'Total Revenue (R$)' AS measure, 'all valid orders 2017-01 to 2018-08' AS filter_context, ROUND(revenue, 2) AS expected_value FROM order_totals
+UNION ALL SELECT 'Orders', 'all', orders FROM order_totals
+UNION ALL SELECT 'AOV (R$)', 'all', ROUND(revenue / orders, 4) FROM order_totals
+UNION ALL SELECT 'Customers', 'all (distinct customer_unique_id)', COUNT(*) FROM person_orders
+UNION ALL SELECT 'Repeat Customer %', 'all', ROUND(100 * CAST(SUM(orders >= 2) AS DOUBLE) / COUNT(*), 4) FROM person_orders
+UNION ALL SELECT 'Delivered Orders (in scope)', 'all', delivered_in_scope FROM order_totals
+UNION ALL SELECT 'On-Time %', 'all', ROUND(100 * CAST(on_time AS DOUBLE) / delivered_in_scope, 4) FROM order_totals
+UNION ALL SELECT 'Late %', 'all', ROUND(100 * CAST(late AS DOUBLE) / delivered_in_scope, 4) FROM order_totals
+UNION ALL SELECT 'Avg Delay (days)', 'all (negative = early)', ROUND(avg_delay, 4) FROM order_totals
+UNION ALL SELECT 'Avg Delivery Days', 'all', ROUND(avg_delivery_days, 4) FROM order_totals
+UNION ALL SELECT 'Avg Review', 'all valid orders with a review', ROUND(avg_review_all, 4) FROM order_totals
+UNION ALL SELECT 'Avg Review (delivered)', 'orders in delivery scope with a review', ROUND(avg_review_delivered, 4) FROM order_totals
+UNION ALL SELECT 'Revenue MoM %', 'month = 2018-08 (vs 2018-07)',
+          ROUND(100 * (MAX(CASE WHEN month_label = '2018-08' THEN revenue END) - MAX(CASE WHEN month_label = '2018-07' THEN revenue END))
+                / MAX(CASE WHEN month_label = '2018-07' THEN revenue END), 4) FROM monthly_revenue
+UNION ALL SELECT 'Revenue MoM %', 'month = 2017-11 (vs 2017-10)',
+          ROUND(100 * (MAX(CASE WHEN month_label = '2017-11' THEN revenue END) - MAX(CASE WHEN month_label = '2017-10' THEN revenue END))
+                / MAX(CASE WHEN month_label = '2017-10' THEN revenue END), 4) FROM monthly_revenue
+UNION ALL SELECT 'Excess Late Orders', 'sellers with 30+ delivered orders (is_ranked_30plus_orders = 1)', ROUND(SUM(excess), 2)
+          FROM seller_excess WHERE is_ranked_30plus_orders = 1
+UNION ALL SELECT 'Excess Late Orders', 'top seller by excess (rank 1)', ROUND(MAX(excess), 2) FROM seller_excess
+UNION ALL SELECT 'Seller Late %', 'sellers with 30+ delivered orders (seller-order pairs)',
+          ROUND(100 * CAST(SUM(p.is_late) AS DOUBLE) / COUNT(*), 4)
+          FROM seller_pairs AS p JOIN dim_seller AS s ON s.seller_id = p.seller_id WHERE s.is_ranked_30plus_orders = 1;

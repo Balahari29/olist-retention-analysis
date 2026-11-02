@@ -21,3 +21,7 @@ powerbi/*Backup*
 .DS_Store
 .vscode/
 .idea/
+
+# Power BI CSV snapshots: regenerate with src/export_views.py, copy to the Windows PC (not versioned)
+powerbi/data/
+powerbi_data.zip

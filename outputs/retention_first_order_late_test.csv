@@ -1,0 +1,2 @@
+n_first_order_late,returned_late,return_rate_late_pct,n_first_order_on_time,returned_on_time,return_rate_on_time_pct,difference_pct_points,ci95_low_pct_points,ci95_high_pct_points,relative_rate_late_vs_on_time,z_score,z_test_p_value,chi_square,chi_square_p_value,min_expected_cell_count,min_detectable_difference_pct_points_80_power
+3667,54,1.473,51566,922,1.788,-0.315,-0.722,0.091,0.824,-1.401,0.16129499362159716,1.962,0.1612949936215932,64.8,0.631

@@ -1,0 +1,4 @@
+first_order_delivery,customers,returned_within_6m,did_not_return,return_within_6m_pct
+First order late,3667,54,3613,1.473
+First order not in delivery scope,1105,14,1091,1.267
+First order on time,51566,922,50644,1.788

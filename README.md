@@ -24,7 +24,7 @@ kaggle datasets download -d olistbr/brazilian-ecommerce -p data/raw --unzip
 .venv/bin/python src/run_dq_checks.py    # runs sql/02_data_quality_checks.sql, writes outputs/dq_*.csv
 .venv/bin/python src/run_analysis.py     # runs sql/03_clean_layer.sql ... 06_views_for_powerbi.sql, writes outputs/
 .venv/bin/jupyter nbconvert --to notebook --execute --inplace notebooks/analysis.ipynb   # RFM, hypothesis test, distance, charts -> outputs/, images/
-.venv/bin/python src/export_views.py    # v_seller_scorecard -> excel/seller_scorecard_data.csv
+.venv/bin/python src/export_views.py    # excel/seller_scorecard_data.csv + powerbi/data/*.csv (star schema, RFM)
 .venv/bin/python src/build_seller_scorecard.py   # -> excel/seller_scorecard.xlsx (then excel/manual_steps.md)
 ```
 **Currency:** all money is in Brazilian reais, written **R$ (BRL)**; output columns with money end in `_brl`.
@@ -155,6 +155,12 @@ enough.
 2. **Estimated dates:** add more buffer to long routes (see the distance section above).
 3. **Marketing:** target **New - high value** customers (15.56 % of customers, 29.4 % of revenue, `outputs/rfm_segments.csv`)
    with a second-purchase campaign, keeping a **random holdout group** to measure the lift.
+4. **Framing the delivery impact:** lead with **customers affected**, not the platform average. A 20 % cut in late
+   orders means about **1,306 fewer late, poorly reviewed orders**, while the platform-wide average review moves only
+   **+0.01 to +0.03 stars** (4.16 to 4.17-4.19) because only 6.79 % of orders are late (`excel/seller_scorecard.xlsx`
+   What-If sheet; inputs from `outputs/delivery_kpis_overall.csv`, `outputs/hypothesis_test_results.csv`). The effect
+   is concentrated on the affected customers and on seller ratings, so the recommendation stands; the average change
+   is context only.
 
 ## Excel seller scorecard (`excel/`)
 `excel/seller_scorecard.xlsx` is built by `src/build_seller_scorecard.py` from `excel/seller_scorecard_data.csv`
@@ -171,3 +177,30 @@ revenue R$ 10,334,128.62.
 (`div_precision_increment`). The seller late rate and platform rate were therefore rounded, so near-equal sellers
 tied in `RANK`/`NTILE` and excess late orders were off by up to 0.02. `v_seller_late_rate` now divides in `DOUBLE`.
 Deciles 1-4 were unchanged; one seller moved from decile 5 to 6 (`outputs/seller_late_rate_by_decile.csv`).
+
+## Does a late first order reduce repeat purchase? (not significant)
+Customers whose **first** valid order arrived late returned within 6 months **1.47 %** of the time (54 of 3,667) vs
+**1.79 %** (922 of 51,566) after an on-time first order: **−0.32 percentage points, 95 % CI −0.72 to +0.09,
+p = 0.161** (two-proportion z-test; chi-square 1.96 = z²). **Not statistically significant.**
+The test is underpowered: with only 54 repeat buyers in the late group it could reliably detect only gaps of about
+**0.63 points** or more, so a smaller real effect cannot be ruled out. The direction matches the review finding but
+this data cannot confirm it. Equal 6-month observation window (cohorts 2017-01 to 2018-02, 56,338 customers);
+1,105 customers whose first order was outside delivery scope are excluded from the test.
+Sources: `outputs/retention_first_order_late_vs_on_time.csv` (SQL), `outputs/retention_first_order_late_test.csv`,
+`outputs/retention_first_order_late_conclusion.txt` (notebook section 2b).
+
+## Power BI (`powerbi/`)
+The .pbix is built on Windows from CSV snapshots of the star-schema views, so the PC needs no MySQL.
+- `powerbi/data/*.csv`: `fact_orders`, `fact_order_items`, `dim_customer`, `dim_seller`, `dim_product`, `dim_date`,
+  `rfm_customer_segments`. **Regenerate** on the Mac with `.venv/bin/python src/run_analysis.py` (rebuilds the views),
+  run the notebook (rewrites `rfm_customer_segments`), then `.venv/bin/python src/export_views.py`.
+  **The CSVs are not in git** (`powerbi/data/` is git-ignored). **Regenerate with `export_views.py`, then copy the
+  folder to the Windows PC.** For an easy copy, zip it from the project root:
+  `zip -r powerbi_data.zip powerbi/data outputs/retention_cohort_long.csv outputs/distance_vs_delay_bands.csv
+  outputs/retention_first_order_late_vs_on_time.csv outputs/rfm_segments.csv` (the zip is git-ignored too).
+- `powerbi/model_spec.md`: tables, keys, relationships, date table, Power Query data types.
+- `powerbi/dax_measures.md`: every KPI as DAX, each with the value it must show, from `outputs/powerbi_expected_values.csv`
+  (computed in SQL from the same views; the UAT baseline).
+- `powerbi/page_layout.md`: 4 pages + drill-through, visuals mapped to user stories, insight titles with sources,
+  slicer plan, one-colour "bad" rule.
+- `powerbi/build_steps.md`: click-by-click Power BI Desktop steps for a beginner.

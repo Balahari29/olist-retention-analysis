@@ -9,6 +9,6 @@ dim_customer distinct customer_id,97905.0
 dim_seller rows,3029.0
 dim_seller ranked (30+ orders),625.0
 dim_product rows,32951.0
-dim_date rows,659.0
+dim_date rows,730.0
 fact_order_items products missing from dim_product,0.0
 fact_orders dates missing from dim_date,0.0

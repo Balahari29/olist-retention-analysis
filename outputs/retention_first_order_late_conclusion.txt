@@ -1,0 +1,2 @@
+Customers whose first order arrived late returned within 6 months 1.47% of the time vs 1.79% after an on-time first order (-0.32 pct points, 95% CI -0.72 to +0.09; p = 0.161): no statistically significant difference.
+With only 54 repeat buyers in the late group, this test could reliably detect a gap of about 0.63 pct points or more, so a smaller real effect cannot be ruled out.

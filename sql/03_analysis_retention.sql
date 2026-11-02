@@ -162,3 +162,51 @@ FROM customer_return
 WHERE TIMESTAMPDIFF(MONTH, cohort_month, (SELECT MAX(purchase_month) FROM v_orders_valid)) >= 6
 GROUP BY cohort_month
 ORDER BY cohort_month;
+
+-- -------------------------------------------------------------------------------------
+-- Does a late FIRST order reduce the chance of a second purchase?
+-- First order = earliest valid order per customer (ties broken by order_id).
+-- Equal observation window (Rule 3): only customers whose first order is in a cohort with
+-- 6 full months of follow-up; "returned" = a valid order in calendar months 1-6 after the first.
+-- First orders outside delivery scope (not delivered, no date) cannot be late/on time: shown separately.
+-- The significance test (chi-square / two-proportion z-test) is in notebooks/analysis.ipynb.
+-- -------------------------------------------------------------------------------------
+-- @output: retention_first_order_late_vs_on_time
+WITH
+ordered AS (
+    SELECT
+        customer_unique_id,
+        order_id,
+        purchase_month,
+        ROW_NUMBER() OVER (PARTITION BY customer_unique_id
+                           ORDER BY order_purchase_timestamp, order_id) AS order_number,
+        MIN(purchase_month) OVER (PARTITION BY customer_unique_id)      AS cohort_month
+    FROM v_orders_valid
+),
+first_orders AS (
+    SELECT customer_unique_id, order_id AS first_order_id, cohort_month
+    FROM ordered
+    WHERE order_number = 1
+),
+returned AS (                       -- 1 if the customer has a valid order 1-6 months after the first month
+    SELECT customer_unique_id,
+           MAX(TIMESTAMPDIFF(MONTH, cohort_month, purchase_month) BETWEEN 1 AND 6) AS returned_within_6m
+    FROM ordered
+    GROUP BY customer_unique_id
+)
+SELECT
+    CASE
+        WHEN d.order_id IS NULL THEN 'First order not in delivery scope'
+        WHEN d.is_late = 1      THEN 'First order late'
+        ELSE                         'First order on time'
+    END                                                         AS first_order_delivery,
+    COUNT(*)                                                    AS customers,
+    SUM(r.returned_within_6m)                                   AS returned_within_6m,
+    COUNT(*) - SUM(r.returned_within_6m)                        AS did_not_return,
+    ROUND(100 * CAST(SUM(r.returned_within_6m) AS DOUBLE) / COUNT(*), 3) AS return_within_6m_pct
+FROM first_orders AS f
+JOIN returned AS r ON r.customer_unique_id = f.customer_unique_id
+LEFT JOIN v_order_delivery AS d ON d.order_id = f.first_order_id
+WHERE TIMESTAMPDIFF(MONTH, f.cohort_month, (SELECT MAX(purchase_month) FROM v_orders_valid)) >= 6
+GROUP BY first_order_delivery
+ORDER BY first_order_delivery;
