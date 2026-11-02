@@ -15,7 +15,9 @@ USE olist;
 -- -------------------------------------------------------------------------------------
 CREATE OR REPLACE VIEW v_seller_late_rate AS
 WITH platform AS (                  -- KPI Late Order % as a fraction, from the same delivery scope
-    SELECT AVG(is_late) AS platform_late_rate FROM v_order_delivery
+    -- DOUBLE division: MySQL AVG()/division of integers rounds to 4 decimals (div_precision_increment),
+    -- which made near-equal late rates tie and shifted excess late orders by up to 0.02.
+    SELECT CAST(SUM(is_late) AS DOUBLE) / COUNT(*) AS platform_late_rate FROM v_order_delivery
 ),
 seller_orders AS (
     SELECT DISTINCT i.seller_id, d.order_id, d.is_late, d.delay_days, r.review_score
@@ -28,7 +30,7 @@ seller_stats AS (
         seller_id,
         COUNT(*)              AS delivered_orders,
         SUM(is_late)          AS late_orders,
-        AVG(is_late)          AS late_rate,          -- unrounded, used for ranking
+        CAST(SUM(is_late) AS DOUBLE) / COUNT(*) AS late_rate,   -- full precision, used for ranking
         AVG(delay_days)       AS avg_delay_days,
         AVG(review_score)     AS avg_review_score
     FROM seller_orders
@@ -206,3 +208,62 @@ SELECT
               / LAG(revenue) OVER (ORDER BY purchase_month), 2)     AS mom_pct
 FROM monthly
 ORDER BY purchase_month;
+
+-- -------------------------------------------------------------------------------------
+-- v_seller_scorecard: source for the Excel seller scorecard (exported by src/export_views.py)
+-- Same sellers and metrics as v_seller_late_rate (>= 30 delivered orders), plus:
+--   reviewed_orders / review_score_sum: so Excel can compute an exact average review (sum / count)
+--   revenue_brl: SUM(price) of the seller's items on valid orders (KPI Total Revenue definition)
+-- -------------------------------------------------------------------------------------
+CREATE OR REPLACE VIEW v_seller_scorecard AS
+WITH seller_order_pairs AS (
+    SELECT DISTINCT i.seller_id, d.order_id
+    FROM order_items AS i
+    JOIN v_order_delivery AS d ON d.order_id = i.order_id
+),
+seller_reviews AS (
+    SELECT pairs.seller_id,
+           COUNT(r.review_score) AS reviewed_orders,
+           SUM(r.review_score)   AS review_score_sum
+    FROM seller_order_pairs AS pairs
+    LEFT JOIN v_order_reviews_dedup AS r ON r.order_id = pairs.order_id
+    GROUP BY pairs.seller_id
+),
+seller_revenue AS (
+    SELECT i.seller_id, SUM(i.price) AS revenue_brl
+    FROM order_items AS i
+    JOIN v_orders_valid AS v ON v.order_id = i.order_id
+    GROUP BY i.seller_id
+)
+SELECT
+    ranking.seller_id,
+    ranking.seller_city,
+    ranking.seller_state,
+    ranking.delivered_orders,
+    ranking.late_orders,
+    ranking.late_rate_pct,
+    ranking.excess_late_orders,
+    ranking.excess_late_rank,
+    ranking.late_rate_rank,
+    ranking.late_rate_decile,
+    reviews.reviewed_orders,
+    reviews.review_score_sum,
+    ranking.avg_review_score,
+    revenue.revenue_brl
+FROM v_seller_late_rate AS ranking
+JOIN seller_reviews AS reviews ON reviews.seller_id = ranking.seller_id
+JOIN seller_revenue AS revenue ON revenue.seller_id = ranking.seller_id;
+
+-- Totals the Excel workbook must reproduce (KPI tiles), plus the platform figures used as targets
+-- @output: seller_scorecard_totals
+SELECT
+    COUNT(*)                                                    AS sellers,
+    SUM(delivered_orders)                                       AS delivered_orders,
+    SUM(late_orders)                                            AS late_orders,
+    ROUND(100 * SUM(late_orders) / SUM(delivered_orders), 4)    AS late_pct,
+    ROUND(SUM(review_score_sum) / SUM(reviewed_orders), 4)      AS avg_review_score,
+    SUM(revenue_brl)                                            AS revenue_brl,
+    SUM(late_rate_decile = 1)                                   AS sellers_in_worst_decile,
+    (SELECT SUM(is_late) FROM v_order_delivery)                 AS platform_late_orders,
+    (SELECT COUNT(*)     FROM v_order_delivery)                 AS platform_delivered_orders
+FROM v_seller_scorecard;

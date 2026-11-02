@@ -24,6 +24,8 @@ kaggle datasets download -d olistbr/brazilian-ecommerce -p data/raw --unzip
 .venv/bin/python src/run_dq_checks.py    # runs sql/02_data_quality_checks.sql, writes outputs/dq_*.csv
 .venv/bin/python src/run_analysis.py     # runs sql/03_clean_layer.sql ... 06_views_for_powerbi.sql, writes outputs/
 .venv/bin/jupyter nbconvert --to notebook --execute --inplace notebooks/analysis.ipynb   # RFM, hypothesis test, distance, charts -> outputs/, images/
+.venv/bin/python src/export_views.py    # v_seller_scorecard -> excel/seller_scorecard_data.csv
+.venv/bin/python src/build_seller_scorecard.py   # -> excel/seller_scorecard.xlsx (then excel/manual_steps.md)
 ```
 **Currency:** all money is in Brazilian reais, written **R$ (BRL)**; output columns with money end in `_brl`.
 
@@ -131,3 +133,41 @@ does not explain February. **Open question:** what explains it? This is a limita
 
 Sources for the strike dates: news coverage from March 2018 (e.g. Congresso em Foco, BNews) and a FINDECT union
 notice from 28 Feb 2018. Add the exact links you cite to the final README.
+
+## Distance vs delay: reading the correlations
+Spearman ρ between seller-to-customer distance and **delivery days** is 0.541, but with the **late flag** only 0.069
+(`outputs/distance_correlation.csv`). Two reasons:
+1. Olist's estimated delivery dates already **scale with distance**, so long routes are slow but mostly still within
+   their (longer) estimate.
+2. ρ is small **partly because "late" is a rare yes/no flag** (6.79 % of delivered orders, `outputs/delivery_kpis_overall.csv`).
+   A 0/1 variable that is almost always 0 is one huge tie, which limits how large any rank correlation can get,
+   even when the effect is real.
+
+The banded view shows the effect clearly: late % rises from 4.49 % (0-100 km) to 11.64 % (1,500+ km)
+(`outputs/distance_vs_delay_bands.csv`). **Long routes are under-buffered:** the estimate grows with distance, but not
+enough.
+
+## Interpretation decisions (for the Phase 7 insight memo)
+1. **Late delivery vs reviews:** the headline is **2.02 stars** lower for late orders, explained by the **0.76-star** gap among
+   reviews written after delivery: 74 % of late reviews were written before the parcel arrived
+   (`outputs/hypothesis_test_results.csv`, `outputs/hypothesis_test_conclusion.txt`).
+   **Recommendation #1:** send the review survey only after delivery is confirmed, and add proactive delay notifications.
+2. **Estimated dates:** add more buffer to long routes (see the distance section above).
+3. **Marketing:** target **New - high value** customers (15.56 % of customers, 29.4 % of revenue, `outputs/rfm_segments.csv`)
+   with a second-purchase campaign, keeping a **random holdout group** to measure the lift.
+
+## Excel seller scorecard (`excel/`)
+`excel/seller_scorecard.xlsx` is built by `src/build_seller_scorecard.py` from `excel/seller_scorecard_data.csv`
+(625 sellers with 30+ delivered orders). Sheets: **KPI** tiles, **Scorecard** (XLOOKUP, status, bottom-10 % highlight,
+excess-late ranking), **What-If** (review uplift range from the hypothesis test), **Targets** (labelled assumptions),
+**Data** (Excel Table). Only inputs are typed; every result is a formula. Power Query, the PivotTable/slicer and the
+Data Table are manual steps in `excel/manual_steps.md`.
+
+**Verification:** the workbook was recalculated with a formula engine (0 errors), and its KPI tiles match
+`outputs/seller_scorecard_totals.csv`: 625 sellers, late 6.73 % (seller-order pairs), average review 4.13,
+revenue R$ 10,334,128.62.
+
+**Precision fix found by this check:** MySQL rounds `AVG()` and integer division to 4 decimals
+(`div_precision_increment`). The seller late rate and platform rate were therefore rounded, so near-equal sellers
+tied in `RANK`/`NTILE` and excess late orders were off by up to 0.02. `v_seller_late_rate` now divides in `DOUBLE`.
+Deciles 1-4 were unchanged; one seller moved from decile 5 to 6 (`outputs/seller_late_rate_by_decile.csv`).
