@@ -1,5 +1,5 @@
 # Resume bullets: Olist Customer Retention & Delivery Experience Analysis
-Project line: **Olist Customer Retention & Delivery Analysis** | MySQL, Python, Excel, Tableau | github.com/Balahari29
+Project line: **Olist Customer Retention & Delivery Analysis** | MySQL, Python, Excel, Power BI | github.com/Balahari29
 Each bullet is under 2 lines; every number traces to the file in *Source* (use these to answer "how did you get that?").
 
 ## Version A: Data Analyst roles
@@ -14,7 +14,7 @@ Each bullet is under 2 lines; every number traces to the file in *Source* (use t
   *Source: `outputs/rfm_segments.csv`*
 
 ## Version B: Business Analyst roles
-- Wrote a BRD, KPI dictionary and 6 user stories for 3 stakeholders, then a 53-check UAT plan with SQL-computed
+- Wrote a BRD, KPI dictionary and 6 user stories for 3 stakeholders, then a 51-check UAT plan with SQL-computed
   expected values for every dashboard KPI.
   *Source: `docs/01_BRD.md`-`docs/03_user_stories.md`, `docs/05_UAT_checklist.md`, `outputs/powerbi_expected_values.csv`*
 - Recommended sending review surveys only after delivery: 74% of late-order reviews came before the parcel arrived,
@@ -24,14 +24,7 @@ Each bullet is under 2 lines; every number traces to the file in *Source* (use t
   and the #1 seller ranked only #135 on late rate.
   *Source: `excel/seller_scorecard.xlsx`, `outputs/seller_excess_summary.csv`, `outputs/seller_late_rate_ranking.csv`*
 
-## Dashboard bullet: use ONLY after the Tableau build passes `docs/05_UAT_checklist.md`
-Until then, do not claim a built dashboard. When all 53 checks pass and the workbook is published, add (either version):
-- Built a 4-dashboard Tableau Public report (relationships, LOD expressions, filter actions) whose KPIs matched SQL on
-  all 53 UAT checks; seller drill-down ranks 625 sellers by excess late orders.
-  *Source: `docs/05_UAT_checklist.md` (filled in), Tableau Public link, `outputs/powerbi_expected_values.csv`*
-
 ## Notes
-- **Tableau** is the built dashboard; **Power BI** is a documented design (`powerbi/`), never built. If asked about
-  Power BI, say "I designed the Power BI model and DAX measures"; do not claim a Power BI dashboard.
-- Before UAT passes, the honest line is "designed and documented the dashboard (Tableau build in progress)".
+- Power BI: say **"designed a Power BI star schema and DAX measures"** until the .pbix is built and passes
+  `docs/05_UAT_checklist.md`; then it can become "built a 4-page Power BI dashboard".
 - "99K orders" = 99,441 raw orders loaded; analyses use 97,905 valid orders (`outputs/clean_layer_checks.csv`).
