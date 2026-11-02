@@ -1,0 +1,9 @@
+table_name,column_name,null_rows,total_rows
+orders,order_purchase_timestamp,0,99441
+orders,order_approved_at,160,99441
+orders,order_delivered_carrier_date,1783,99441
+orders,order_delivered_customer_date,2965,99441
+orders,order_estimated_delivery_date,0,99441
+order_items,shipping_limit_date,0,112650
+order_reviews,review_creation_date,0,99224
+order_reviews,review_answer_timestamp,0,99224

@@ -1,0 +1,8 @@
+rule_checked,rows_found
+order_items.price = 0,0
+order_items.freight_value = 0,383
+order_payments.payment_value = 0,9
+order_payments.payment_installments = 0,2
+order_payments.payment_type = not_defined,3
+products.product_weight_g = 0,4
+products with NULL dimensions/weight,2

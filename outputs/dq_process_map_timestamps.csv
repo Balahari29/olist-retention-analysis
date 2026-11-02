@@ -1,0 +1,7 @@
+step_check,rows_checked,violations
+S->2  approved before purchase,99281,0
+2->5  handed to carrier before approval,97644,1359
+5->7  delivered to customer before carrier pick-up,96475,23
+S->7  delivered before purchase,96476,0
+3     estimated delivery date before purchase,99441,0
+4->5  carrier pick-up after shipping limit (late hand-over),97657,8849

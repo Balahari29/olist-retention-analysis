@@ -1,0 +1,6 @@
+survey_timing,reviews,created_on_or_after_estimated_date
+0 order has no delivered date,2865,2673
+1 survey before delivery,5127,4713
+2 same day or next day,88837,4216
+3 2-7 days after delivery,1796,203
+4 more than 7 days after delivery,599,377

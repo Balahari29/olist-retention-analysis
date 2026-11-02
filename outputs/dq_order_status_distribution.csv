@@ -1,0 +1,9 @@
+order_status,orders,pct_of_orders,with_approved_date,with_carrier_date,with_delivered_date,with_items,with_payment,with_review
+delivered,96478,97.02,96464,96476,96470,96478,96477,95832
+shipped,1107,1.11,1107,1107,0,1106,1107,1032
+canceled,625,0.63,484,75,6,461,625,605
+unavailable,609,0.61,609,0,0,6,609,595
+invoiced,314,0.32,314,0,0,312,314,309
+processing,301,0.3,301,0,0,301,301,295
+created,5,0.01,0,0,0,0,5,3
+approved,2,0.0,2,0,0,2,2,2

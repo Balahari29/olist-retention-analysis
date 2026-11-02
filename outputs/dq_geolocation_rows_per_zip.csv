@@ -1,0 +1,2 @@
+zip_prefixes,total_rows,min_rows_per_zip,avg_rows_per_zip,max_rows_per_zip,zips_with_exactly_1_row,zips_with_more_than_1_row,exact_duplicate_rows
+19015,1000163,1,52.6,1146,1043,17972,279667
