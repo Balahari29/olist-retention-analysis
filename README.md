@@ -3,7 +3,7 @@
 **Late deliveries cost Olist about 2 review stars, but 74% of those late-order reviews were written before the parcel
 arrived.** Only 3% of customers buy twice, and 15.56% of customers ("New - high value") hold 29.40% of revenue.
 End-to-end project on ~100K Brazilian e-commerce orders: MySQL data model, data-quality checks, Python statistics,
-an Excel scorecard, a Power BI specification and business-analysis documents.
+an Excel scorecard, a Tableau Public dashboard (Power BI version documented as a design) and business-analysis documents.
 
 *Author: Bala Hariharan B · [github.com/Balahari29](https://github.com/Balahari29) · Data: Kaggle
 [`olistbr/brazilian-ecommerce`](https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce) · All money in R$ (BRL).*
@@ -34,15 +34,23 @@ Recommendations and their expected impact: [`docs/06_insight_memo.md`](docs/06_i
 
 More charts in [`images/`](images/) (on-time % by month, late % by state, cohort heatmap, category Pareto).
 
-## Dashboard (Power BI)
-*Screenshots to be added after the Windows build (`powerbi/build_steps.md`, Step 12).*
+## Dashboard
+**Built: Tableau Public.** Live link: **[Tableau Public link: to be added after publishing]**
+*Screenshots to be added after the build passes `docs/05_UAT_checklist.md` (`tableau/build_steps.md`, Step 9).*
 
-| Page | Screenshot |
+| Dashboard | Screenshot |
 |---|---|
 | Executive Overview | `images/dashboard_1_executive.png` *(placeholder)* |
 | Delivery vs Satisfaction | `images/dashboard_2_delivery.png` *(placeholder)* |
 | Customer Segments | `images/dashboard_3_segments.png` *(placeholder)* |
-| Seller Performance (with drill-through) | `images/dashboard_4_sellers.png` *(placeholder)* |
+| Seller Performance (filter action to Seller Detail) | `images/dashboard_4_sellers.png` *(placeholder)* |
+
+How it was built: [`tableau/data_model.md`](tableau/data_model.md) (relationships), [`tableau/calculated_fields.md`](tableau/calculated_fields.md)
+(every KPI with its expected value), [`tableau/build_steps.md`](tableau/build_steps.md).
+
+**Documented design: Power BI.** The same dashboard specified for Power BI Desktop (star schema, relationships, DAX
+measures, page layout with insight titles, build steps) in [`powerbi/`](powerbi/). It has not been built (no Windows PC);
+the Tableau build follows its page layout, colour rule and expected values.
 
 ## Tech stack
 | Area | Tools and techniques |
@@ -50,7 +58,8 @@ More charts in [`images/`](images/) (on-time % by month, late % by state, cohort
 | Database | MySQL 8.4: star schema with PKs/FKs, CTEs, window functions (`ROW_NUMBER`, `RANK`, `NTILE`, `LAG`, running `SUM`), views |
 | Python | pandas, NumPy, SciPy (Mann-Whitney U, chi-square, Spearman, bootstrap), matplotlib, seaborn, SQLAlchemy, PyMySQL, Jupyter |
 | Excel | Microsoft 365: Excel Table, `XLOOKUP`, `RANK.EQ`, `PERCENTILE.INC`, conditional formatting, What-If Data Table, Power Query, PivotTable + slicer (workbook built with openpyxl) |
-| Power BI | Star schema, relationships, marked date table, DAX measures (time intelligence, `SUMX`, `ADDCOLUMNS`), drill-through |
+| Tableau Public | Relationships (logical layer), calculated fields, LOD expressions (`FIXED`, `INCLUDE`), table calculations, filter actions, dashboards |
+| Power BI (design) | Star schema, relationships, marked date table, DAX measures (time intelligence, `SUMX`, `ADDCOLUMNS`), drill-through: specified, not built |
 | Business analysis | BRD, KPI dictionary, user stories with acceptance criteria, process map (draw.io), UAT checklist, insight memo |
 
 ## Project structure
@@ -66,7 +75,7 @@ olist-retention-analysis/
 │   ├── 02_KPI_dictionary.md      KPI definitions and formulas
 │   ├── 03_user_stories.md        US-01 to US-06 with acceptance criteria
 │   ├── 04_process_map_steps.md   order-to-review process (04_process_map.drawio: to draw)
-│   ├── 05_UAT_checklist.md       51 dashboard checks with expected values
+│   ├── 05_UAT_checklist.md       53 dashboard checks with expected values
 │   ├── 06_insight_memo.md        findings and 3 recommendations
 │   ├── project_log.md            detailed phase notes and decisions
 │   ├── resume_bullets.md
@@ -83,11 +92,13 @@ olist-retention-analysis/
 │   ├── load_to_mysql.py          CSV → MySQL, row-count reconciliation
 │   ├── run_dq_checks.py          runs 02_*.sql → outputs/dq_*.csv
 │   ├── run_analysis.py           runs 03-06 → outputs/
-│   ├── export_views.py           views → excel/ and powerbi/data/ CSVs
+│   ├── export_views.py           views → excel/, tableau/data/ and powerbi/data/ CSVs
 │   └── build_seller_scorecard.py builds excel/seller_scorecard.xlsx
 ├── notebooks/analysis.ipynb      RFM, hypothesis tests, distance, charts
 ├── excel/                        seller scorecard workbook, its data, manual steps
-├── powerbi/                      model spec, DAX, page layout, build steps
+├── tableau/                      built dashboard: data model, calculated fields, build steps
+│   └── data/                     star schema + static CSVs (git-ignored; regenerate)
+├── powerbi/                      documented design: model spec, DAX, page layout, build steps
 │   └── data/                     star-schema CSVs (git-ignored; regenerate)
 ├── outputs/                      every result cited in the docs (CSV/TXT)
 └── images/                       charts (and dashboard screenshots)
@@ -110,11 +121,12 @@ cp .env.example .env                       # then set MYSQL_PASSWORD in .env
 .venv/bin/python src/run_dq_checks.py      # data-quality checks -> outputs/dq_*.csv
 .venv/bin/python src/run_analysis.py       # clean layer, analysis, Power BI views -> outputs/
 .venv/bin/jupyter nbconvert --to notebook --execute --inplace notebooks/analysis.ipynb
-.venv/bin/python src/export_views.py       # excel/seller_scorecard_data.csv + powerbi/data/*.csv
+.venv/bin/python src/export_views.py       # excel/, tableau/data/ and powerbi/data/ CSVs
 .venv/bin/python src/build_seller_scorecard.py
 ```
-Then: Excel manual steps in `excel/manual_steps.md`. **Power BI: regenerate with `export_views.py`, then copy the
-folder to the Windows PC.** For an easy copy: `zip -r powerbi_data.zip powerbi/data outputs/retention_cohort_long.csv
+Then: Excel manual steps in `excel/manual_steps.md`. **Tableau:** open Tableau Public and follow
+`tableau/build_steps.md` (data in `tableau/data/`; `zip -r tableau_data.zip tableau/data` to move it, git-ignored).
+**Power BI (design): regenerate with `export_views.py`, then copy the folder to the Windows PC.** For an easy copy: `zip -r powerbi_data.zip powerbi/data outputs/retention_cohort_long.csv
 outputs/distance_vs_delay_bands.csv outputs/retention_first_order_late_vs_on_time.csv outputs/rfm_segments.csv`
 (git-ignored), then follow `powerbi/build_steps.md`.
 
@@ -145,5 +157,6 @@ Applied once, in `sql/03_clean_layer.sql`; full reasoning in [`docs/project_log.
   [Process map steps](docs/04_process_map_steps.md) · [UAT checklist](docs/05_UAT_checklist.md) ·
   [Insight memo](docs/06_insight_memo.md)
 - Technical: [Project log](docs/project_log.md) (schema, data quality, rules, every analysis decision) ·
-  [Power BI model](powerbi/model_spec.md) · [DAX measures](powerbi/dax_measures.md) ·
-  [Page layout](powerbi/page_layout.md) · [Excel steps](excel/manual_steps.md)
+  [Tableau data model](tableau/data_model.md) · [Tableau calculated fields](tableau/calculated_fields.md) ·
+  [Tableau build steps](tableau/build_steps.md) · [Power BI model](powerbi/model_spec.md) ·
+  [DAX measures](powerbi/dax_measures.md) · [Page layout](powerbi/page_layout.md) · [Excel steps](excel/manual_steps.md)

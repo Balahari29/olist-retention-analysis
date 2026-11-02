@@ -188,3 +188,16 @@ The .pbix is built on Windows from CSV snapshots of the star-schema views, so th
 - `powerbi/page_layout.md`: 4 pages + drill-through, visuals mapped to user stories, insight titles with sources,
   slicer plan, one-colour "bad" rule.
 - `powerbi/build_steps.md`: click-by-click Power BI Desktop steps for a beginner.
+
+## Tableau Public build (after Phase 7; no Windows PC for Power BI)
+- **Decision:** the dashboard is built in **Tableau Public on the Mac**; `powerbi/` is kept unchanged as the documented design.
+- **Data:** `src/export_views.py` writes the same star-schema CSVs to `tableau/data/` (byte-identical to `powerbi/data/`)
+  plus 4 static outputs (cohort, distance bands, first-order test, RFM summary). Git-ignored; `tableau_data.zip` to move it.
+- **Model differences from Power BI** (`tableau/data_model.md`): Tableau relationships must form a tree, so
+  `fact_order_items` relates to `fact_orders` by `order_id` (safe: relationships aggregate each measure at its own table's
+  level) and `dim_date` relates to `fact_orders` only.
+- **Calculation choices** (`tableau/calculated_fields.md`): Platform Late Rate is a `FIXED` LOD (ignores filters, like
+  DAX `REMOVEFILTERS`); Repeat Customer % uses an `INCLUDE` LOD so it follows the date filter without a context filter
+  (which would also move the FIXED platform rate); seller counts use distinct `seller|order` keys so excess late orders
+  are correct at any level; top-N lists use an `INDEX()` table-calculation filter so they apply after the other filters.
+- **UAT:** `docs/05_UAT_checklist.md` v2.0, 53 checks, same expected values.
