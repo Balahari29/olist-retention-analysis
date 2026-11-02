@@ -1,0 +1,23 @@
+# Raw Kaggle data: never edited, never committed (download it again with the command in README)
+data/raw/*
+!data/raw/.gitkeep
+
+# Secrets
+.env
+kaggle.json
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+
+# Power BI / Excel backups and lock files
+*.pbix.bak
+powerbi/*Backup*
+~$*.xlsx
+
+# OS / editor
+.DS_Store
+.vscode/
+.idea/

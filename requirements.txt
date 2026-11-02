@@ -1,0 +1,21 @@
+# Analysis
+pandas>=2.2
+numpy>=1.26
+scipy>=1.12
+matplotlib>=3.8
+seaborn>=0.13
+
+# Database (MySQL 8)
+sqlalchemy>=2.0
+pymysql>=1.1
+cryptography>=42      # needed by pymysql for MySQL 8's default auth (caching_sha2_password)
+python-dotenv>=1.0    # reads MySQL credentials from .env
+
+# Excel
+openpyxl>=3.1
+
+# Notebooks
+jupyter>=1.0
+
+# Data download
+kaggle>=1.6
