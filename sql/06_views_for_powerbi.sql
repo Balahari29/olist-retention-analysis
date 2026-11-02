@@ -159,9 +159,9 @@ LEFT JOIN v_order_reviews_dedup AS r ON r.order_id = i.order_id;
 -- @output: powerbi_views_checks
 SELECT 'fact_orders rows'                     AS item, COUNT(*) AS value FROM fact_orders
 UNION ALL SELECT 'fact_orders distinct order_id',      COUNT(DISTINCT order_id) FROM fact_orders
-UNION ALL SELECT 'fact_orders SUM(order_revenue)',     SUM(order_revenue) FROM fact_orders
+UNION ALL SELECT 'fact_orders SUM(order_revenue) R$',     SUM(order_revenue) FROM fact_orders
 UNION ALL SELECT 'fact_order_items rows',              COUNT(*) FROM fact_order_items
-UNION ALL SELECT 'fact_order_items SUM(price)',        SUM(price) FROM fact_order_items
+UNION ALL SELECT 'fact_order_items SUM(price) R$',        SUM(price) FROM fact_order_items
 UNION ALL SELECT 'dim_customer rows',                  COUNT(*) FROM dim_customer
 UNION ALL SELECT 'dim_customer distinct customer_id',  COUNT(DISTINCT customer_id) FROM dim_customer
 UNION ALL SELECT 'dim_seller rows',                    COUNT(*) FROM dim_seller

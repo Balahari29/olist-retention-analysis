@@ -228,10 +228,10 @@ SELECT
     SUM(ABS(items_total - payments_total) <= 0.01)    AS orders_matching_within_1_cent,
     SUM(payments_total - items_total > 0.01)          AS orders_payment_higher,
     SUM(items_total - payments_total > 0.01)          AS orders_payment_lower,
-    SUM(items_price)                                  AS total_price,
-    SUM(items_freight)                                AS total_freight,
-    SUM(items_total)                                  AS total_price_plus_freight,
-    SUM(payments_total)                               AS total_payment_value
+    SUM(items_price)                                  AS total_price_brl,
+    SUM(items_freight)                                AS total_freight_brl,
+    SUM(items_total)                                  AS total_price_plus_freight_brl,
+    SUM(payments_total)                               AS total_payment_value_brl
 FROM (SELECT i.order_id, i.items_price, i.items_freight,
              i.items_price + i.items_freight AS items_total,
              p.payments_total

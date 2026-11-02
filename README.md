@@ -23,7 +23,10 @@ kaggle datasets download -d olistbr/brazilian-ecommerce -p data/raw --unzip
 .venv/bin/python src/load_to_mysql.py    # runs sql/01_schema.sql, loads 9 CSVs, writes outputs/row_counts.csv
 .venv/bin/python src/run_dq_checks.py    # runs sql/02_data_quality_checks.sql, writes outputs/dq_*.csv
 .venv/bin/python src/run_analysis.py     # runs sql/03_clean_layer.sql ... 06_views_for_powerbi.sql, writes outputs/
+.venv/bin/jupyter nbconvert --to notebook --execute --inplace notebooks/analysis.ipynb   # RFM, hypothesis test, distance, charts -> outputs/, images/
 ```
+**Currency:** all money is in Brazilian reais, written **R$ (BRL)**; output columns with money end in `_brl`.
+
 Environment used: Python 3.12, MySQL 8.4 LTS (Homebrew `mysql@8.4`; any MySQL 8.0+ works, since window functions are required).
 
 ## Schema decisions (`sql/01_schema.sql`)
@@ -65,7 +68,7 @@ fields. Always count rows with a CSV parser, not `wc -l`.
 | — | Orders with no items | 775 orders: unavailable 603, canceled 164, created 5, invoiced 2, shipped 1 | `outputs/dq_orders_without_items.csv` |
 | — | Orders with no payment | 1 (status delivered) | `outputs/dq_orders_without_payment.csv` |
 | G6 | Category translation | 610 products (1,603 order items) have no category; `portateis_cozinha_e_preparadores_de_alimentos` (10 products) and `pc_gamer` (3 products) have no English translation | `outputs/dq_category_translation.csv` |
-| — | Revenue reconciliation | Of 98,665 orders with items and payments, 98,362 match price + freight = payments within 1 cent; payments higher in 264, lower in 39. Totals: price + freight 15,843,409.78 vs payments 15,846,280.17 | `outputs/dq_revenue_reconciliation.csv` |
+| — | Revenue reconciliation | Of 98,665 orders with items and payments, 98,362 match price + freight = payments within 1 cent; payments higher in 264, lower in 39. Totals: price + freight R$ 15,843,409.78 vs payments R$ 15,846,280.17 | `outputs/dq_revenue_reconciliation.csv` |
 | — | Value ranges | No zero prices; 383 items with zero freight; 9 zero-value payments; 2 payments with 0 instalments; 3 `not_defined` payment types | `outputs/dq_value_ranges.csv` |
 | PM | Process-map step order | 0 approvals before purchase; 0 estimated dates before purchase; **1,359 carrier pick-ups dated before approval**; 23 deliveries before carrier pick-up; 8,849 of 97,657 orders picked up after the seller's shipping limit | `outputs/dq_process_map_timestamps.csv` |
 | PM | Survey timing (step 9) | 88,837 of 99,224 surveys created the same or next day after delivery; 5,127 before delivery (4,713 of them on/after the estimated date); 2,865 for orders with no delivered date | `outputs/dq_review_timing.csv` |
@@ -105,3 +108,26 @@ fields. Always count rows with a CSV parser, not `wc -l`.
 
 **Category names** (view `v_product_category`): English name from `category_translation`; the 2 untranslated
 categories keep their Portuguese name; products with no category become `'unknown'`.
+
+## Delivery late-rate spikes: possible explanations (consistent with the data, not proof)
+Late Order % by purchase month is mostly 1-7 %, with three spikes: 2017-11 (12.4 %), 2018-02 (14.13 %) and
+2018-03 (18.96 %) (`outputs/delivery_ontime_by_month.csv`). The data cannot show *why*; these explanations fit the
+timing, and the checks below show where they fit and where they do not.
+
+**2017-11: Black Friday 2017 (24 November).** Orders rose from 4,547 to 7,421 (+63.2 %) and revenue rose +52.06 %
+month over month (`outputs/revenue_mom.csv`). Orders bought in Black Friday week (20-26 Nov) were late 17.26 % of the
+time vs 9.17 % for the rest of November (`outputs/delivery_spike_black_friday.csv`). This **fits** a volume surge
+overloading sellers and carriers.
+
+**2018-03: Correios (national postal service) strike that began on 12 March 2018.** A union federation notice
+listed the SP, RJ, Bauru (SP), MA and TO bases as joining; on 13 March the labour court (TST) ruled against the strike
+and assemblies in several states voted to return to work from 14 March. The **timing fits** (March is the peak month).
+The **state pattern does not clearly fit**: in 2018-03 orders to SP, RJ, MA and TO were late 15.57 % vs 23.23 % for all
+other states (`outputs/delivery_spike_strike_states.csv`). A wider national stoppage, or another cause, would explain this better than
+a strike limited to those states.
+
+**2018-02** was already high in both state groups (14.47 % and 13.71 %) *before* the strike began, so the strike
+does not explain February. **Open question:** what explains it? This is a limitation to state in the memo.
+
+Sources for the strike dates: news coverage from March 2018 (e.g. Congresso em Foco, BNews) and a FINDECT union
+notice from 28 Feb 2018. Add the exact links you cite to the final README.

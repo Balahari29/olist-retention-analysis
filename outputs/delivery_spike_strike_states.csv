@@ -1,0 +1,11 @@
+purchase_month,state_group,delivered_orders,late_pct
+2018-01-01,other states,3173,5.86
+2018-01-01,"SP, RJ, MA, TO",3896,5.57
+2018-02-01,other states,2969,13.71
+2018-02-01,"SP, RJ, MA, TO",3586,14.47
+2018-03-01,other states,3099,23.23
+2018-03-01,"SP, RJ, MA, TO",3904,15.57
+2018-04-01,other states,2924,7.15
+2018-04-01,"SP, RJ, MA, TO",3874,2.5
+2018-05-01,other states,2747,8.92
+2018-05-01,"SP, RJ, MA, TO",4002,4.95

@@ -1,6 +1,7 @@
 -- =====================================================================================
 -- 05_analysis_sellers_categories.sql : Q3 (which sellers cause delays) and Q5 (revenue concentration)
--- Revenue = SUM(order_items.price) on valid orders (KPI dictionary; excludes freight).
+-- Revenue = SUM(order_items.price) on valid orders (KPI dictionary, excludes freight).
+-- All money is in Brazilian reais: output columns end in _brl (R$).
 -- =====================================================================================
 USE olist;
 
@@ -9,9 +10,14 @@ USE olist;
 -- An order with items from 2 sellers counts once for each seller (lateness is order-level).
 -- late_rate_decile: NTILE(10) ordered worst first, so decile 1 = worst 10 % of sellers.
 -- Ties are broken by more delivered orders, then seller_id, so the result is repeatable.
+-- excess_late_orders = late_orders - delivered_orders x platform late rate: how many more late orders
+-- the seller had than an average seller of the same size (ranks big sellers fairly against small ones).
 -- -------------------------------------------------------------------------------------
 CREATE OR REPLACE VIEW v_seller_late_rate AS
-WITH seller_orders AS (
+WITH platform AS (                  -- KPI Late Order % as a fraction, from the same delivery scope
+    SELECT AVG(is_late) AS platform_late_rate FROM v_order_delivery
+),
+seller_orders AS (
     SELECT DISTINCT i.seller_id, d.order_id, d.is_late, d.delay_days, r.review_score
     FROM order_items AS i
     JOIN v_order_delivery AS d ON d.order_id = i.order_id
@@ -38,10 +44,13 @@ SELECT
     ROUND(100 * stats.late_rate, 2)       AS late_rate_pct,
     ROUND(stats.avg_delay_days, 2)        AS avg_delay_days,
     ROUND(stats.avg_review_score, 2)      AS avg_review_score,
+    ROUND(stats.late_orders - stats.delivered_orders * platform.platform_late_rate, 2) AS excess_late_orders,
     RANK()    OVER (ORDER BY stats.late_rate DESC)                                         AS late_rate_rank,
-    NTILE(10) OVER (ORDER BY stats.late_rate DESC, stats.delivered_orders DESC, stats.seller_id) AS late_rate_decile
+    NTILE(10) OVER (ORDER BY stats.late_rate DESC, stats.delivered_orders DESC, stats.seller_id) AS late_rate_decile,
+    RANK()    OVER (ORDER BY stats.late_orders - stats.delivered_orders * platform.platform_late_rate DESC) AS excess_late_rank
 FROM seller_stats AS stats
-JOIN sellers ON sellers.seller_id = stats.seller_id;
+JOIN sellers ON sellers.seller_id = stats.seller_id
+CROSS JOIN platform;
 
 -- How many sellers pass the 30-order threshold, and how much of the volume they cover
 -- @output: seller_eligibility
@@ -60,7 +69,7 @@ SELECT
                                                    AS pct_of_pairs_covered
 FROM seller_orders;
 
--- Seller ranking (US-03), worst first
+-- Seller ranking (US-03), worst late rate first. excess_late_rank gives the volume-adjusted ranking.
 -- @output: seller_late_rate_ranking
 SELECT *
 FROM v_seller_late_rate
@@ -75,6 +84,7 @@ SELECT
     SUM(late_orders)                                             AS late_orders,
     ROUND(100 * SUM(late_orders) / SUM(delivered_orders), 2)     AS late_rate_pct,
     ROUND(100 * SUM(late_orders) / SUM(SUM(late_orders)) OVER (), 2) AS share_of_all_late_orders_pct,
+    ROUND(SUM(excess_late_orders), 2)                            AS excess_late_orders,
     MIN(late_rate_pct)                                           AS min_seller_late_rate_pct,
     MAX(late_rate_pct)                                           AS max_seller_late_rate_pct
 FROM v_seller_late_rate
@@ -88,9 +98,9 @@ ORDER BY late_rate_decile;
 SELECT
     COUNT(*)                                     AS valid_orders,
     COUNT(DISTINCT customer_unique_id)           AS customers,
-    SUM(order_revenue)                           AS total_revenue,
-    ROUND(SUM(order_revenue) / COUNT(*), 2)      AS aov,
-    SUM(order_freight)                           AS total_freight
+    SUM(order_revenue)                           AS total_revenue_brl,
+    ROUND(SUM(order_revenue) / COUNT(*), 2)      AS aov_brl,
+    SUM(order_freight)                           AS total_freight_brl
 FROM v_orders_valid;
 
 -- -------------------------------------------------------------------------------------
@@ -120,7 +130,7 @@ running AS (
 SELECT
     revenue_rank,
     category_english,
-    revenue,
+    revenue                                     AS revenue_brl,
     orders,
     ROUND(100 * revenue_share, 2)               AS revenue_pct,
     ROUND(100 * cumulative_share, 2)            AS cumulative_pct,
@@ -147,7 +157,7 @@ running AS (
 SELECT
     revenue_rank,
     customer_state,
-    revenue,
+    revenue                                     AS revenue_brl,
     orders,
     ROUND(100 * revenue_share, 2)               AS revenue_pct,
     ROUND(100 * cumulative_share, 2)            AS cumulative_pct,
@@ -166,10 +176,10 @@ SELECT 'product category' AS dimension,
        COUNT(*)                                    AS members,
        SUM(in_first_80pct)                         AS members_for_80pct_revenue,
        ROUND(100 * SUM(in_first_80pct) / COUNT(*), 2) AS pct_of_members,
-       SUM(revenue)                                AS total_revenue
+       SUM(revenue_brl)                            AS total_revenue_brl
 FROM v_pareto_category
 UNION ALL
-SELECT 'customer state', COUNT(*), SUM(in_first_80pct), ROUND(100 * SUM(in_first_80pct) / COUNT(*), 2), SUM(revenue)
+SELECT 'customer state', COUNT(*), SUM(in_first_80pct), ROUND(100 * SUM(in_first_80pct) / COUNT(*), 2), SUM(revenue_brl)
 FROM v_pareto_state;
 
 -- -------------------------------------------------------------------------------------
@@ -188,10 +198,10 @@ WITH monthly AS (
 SELECT
     purchase_month,
     orders,
-    revenue,
-    aov,
-    LAG(revenue) OVER (ORDER BY purchase_month)                     AS previous_month_revenue,
-    revenue - LAG(revenue) OVER (ORDER BY purchase_month)           AS mom_change,
+    revenue                                                         AS revenue_brl,
+    aov                                                             AS aov_brl,
+    LAG(revenue) OVER (ORDER BY purchase_month)                     AS previous_month_revenue_brl,
+    revenue - LAG(revenue) OVER (ORDER BY purchase_month)           AS mom_change_brl,
     ROUND(100 * (revenue - LAG(revenue) OVER (ORDER BY purchase_month))
               / LAG(revenue) OVER (ORDER BY purchase_month), 2)     AS mom_pct
 FROM monthly

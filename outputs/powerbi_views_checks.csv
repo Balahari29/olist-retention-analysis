@@ -1,9 +1,9 @@
 item,value
 fact_orders rows,97905.0
 fact_orders distinct order_id,97905.0
-fact_orders SUM(order_revenue),13449529.68
+fact_orders SUM(order_revenue) R$,13449529.68
 fact_order_items rows,111752.0
-fact_order_items SUM(price),13449529.68
+fact_order_items SUM(price) R$,13449529.68
 dim_customer rows,97905.0
 dim_customer distinct customer_id,97905.0
 dim_seller rows,3029.0

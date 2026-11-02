@@ -84,3 +84,31 @@ SELECT
     ROUND(AVG(CASE WHEN is_late = 1 THEN approval_to_pickup_days END), 2) AS avg_days_late_orders,
     ROUND(AVG(CASE WHEN is_late = 0 THEN approval_to_pickup_days END), 2) AS avg_days_on_time_orders
 FROM v_order_delivery;
+
+-- -------------------------------------------------------------------------------------
+-- Late-rate spikes: are the explanations CONSISTENT with the data? (not proof)
+-- (a) Correios strike from 12 March 2018, reported in SP, RJ, MA, TO: strike states vs others by month
+-- -------------------------------------------------------------------------------------
+-- @output: delivery_spike_strike_states
+SELECT
+    purchase_month,
+    CASE WHEN customer_state IN ('SP', 'RJ', 'MA', 'TO') THEN 'SP, RJ, MA, TO' ELSE 'other states' END AS state_group,
+    COUNT(*)                          AS delivered_orders,
+    ROUND(100 * AVG(is_late), 2)      AS late_pct
+FROM v_order_delivery
+WHERE purchase_month BETWEEN '2018-01-01' AND '2018-05-01'
+GROUP BY purchase_month, state_group
+ORDER BY purchase_month, state_group;
+
+-- (b) Black Friday 2017 (24 Nov): orders bought in Black Friday week vs the rest of November 2017
+-- @output: delivery_spike_black_friday
+SELECT
+    CASE WHEN purchase_date BETWEEN '2017-11-20' AND '2017-11-26' THEN 'Black Friday week (20-26 Nov)'
+         ELSE 'rest of November' END   AS purchase_period,
+    COUNT(*)                          AS delivered_orders,
+    ROUND(100 * AVG(is_late), 2)      AS late_pct,
+    ROUND(AVG(delivery_days), 2)      AS avg_delivery_days
+FROM v_order_delivery
+WHERE purchase_month = '2017-11-01'
+GROUP BY purchase_period
+ORDER BY purchase_period;

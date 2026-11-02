@@ -67,6 +67,7 @@ Without these answers, money spent on marketing and logistics improvements canno
 | A-5 | An order is "on time" if delivered on or before the estimated delivery **date** (date-level comparison, time of day ignored). | Phase 2 |
 | A-6 | Where an order has more than one review, one review per order will be used (proposed: the most recently answered). Rule **[TBD]**. | Phase 2 DQ |
 | A-7 | Results describe Olist in 2016–2018 and are not assumed to hold today. | — |
+| A-8 | All money is in Brazilian reais, written R$ (BRL); no currency conversion is done. | — |
 | C-1 | Tools are limited to free/desktop tools: MySQL 8, Python, Excel, Power BI Desktop, draw.io. | — |
 
 ## 7. Data sources

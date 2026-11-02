@@ -2,7 +2,8 @@
 **Project:** Olist Customer Retention & Delivery Experience Analysis
 **Version:** 0.1 (draft, Phase 1) | **Date:** 2026-11-02
 
-> One definition per KPI, used everywhere (SQL, Python, Excel, Power BI). Targets are **[TBD]** until baselines are
+> One definition per KPI, used everywhere (SQL, Python, Excel, Power BI). **Currency: all money is in Brazilian
+> reais, R$ (BRL)**; output columns with money end in `_brl`. Targets are **[TBD]** until baselines are
 > calculated and saved to `outputs/`.
 
 ## Shared definitions
@@ -17,8 +18,8 @@
 ## KPIs
 | KPI | Business definition | Exact formula | Source tables.columns | Owner | Refresh | Target |
 |---|---|---|---|---|---|---|
-| **Total Revenue** | Value of products sold on valid orders, excluding freight. | `SUM(order_items.price)` over valid orders | `order_items.price`, `order_items.order_id` → `orders.order_status` | Marketing Manager | Monthly | [TBD] |
-| **AOV** (Average Order Value) | Average product value of one valid order. | `Total Revenue / COUNT(DISTINCT orders.order_id)` over valid orders | `order_items.price`, `orders.order_id`, `orders.order_status` | Marketing Manager | Monthly | [TBD] |
+| **Total Revenue** (R$) | Value of products sold on valid orders, in R$, excluding freight. | `SUM(order_items.price)` over valid orders | `order_items.price`, `order_items.order_id` → `orders.order_status` | Marketing Manager | Monthly | [TBD] |
+| **AOV** (Average Order Value, R$) | Average product value of one valid order, in R$. | `Total Revenue / COUNT(DISTINCT orders.order_id)` over valid orders | `order_items.price`, `orders.order_id`, `orders.order_status` | Marketing Manager | Monthly | [TBD] |
 | **Repeat Customer %** | Share of customers who placed two or more valid orders. | `COUNT(customers with ≥ 2 DISTINCT valid order_id) / COUNT(DISTINCT customer_unique_id with ≥ 1 valid order) × 100` | `customers.customer_unique_id`, `customers.customer_id` → `orders.customer_id`, `orders.order_id`, `orders.order_status` | Marketing Manager | Monthly | [TBD] |
 | **On-Time Delivery %** | Share of delivered orders that arrived on or before the estimated delivery date. | `COUNT(delivered orders WHERE Delay ≤ 0) / COUNT(delivered orders) × 100` | `orders.order_status`, `orders.order_delivered_customer_date`, `orders.order_estimated_delivery_date` | Logistics Manager | Weekly | [TBD] |
 | **Late Order %** | Share of delivered orders that arrived after the estimated delivery date. | `COUNT(delivered orders WHERE Delay > 0) / COUNT(delivered orders) × 100` (so On-Time % + Late % = 100%) | Same as On-Time Delivery % | Logistics Manager | Weekly | [TBD] |

@@ -1,4 +1,4 @@
-purchase_month,orders,revenue,aov,previous_month_revenue,mom_change,mom_pct
+purchase_month,orders,revenue_brl,aov_brl,previous_month_revenue_brl,mom_change_brl,mom_pct
 2017-01-01,787,120098.27,152.6,,,
 2017-02-01,1718,244959.35,142.58,120098.27,124861.08,103.97
 2017-03-01,2617,368341.32,140.75,244959.35,123381.97,50.37

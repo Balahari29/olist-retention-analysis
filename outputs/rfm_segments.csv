@@ -1,0 +1,9 @@
+segment,customers,pct_of_customers,revenue_brl,revenue_share_pct,avg_recency_days,avg_orders,avg_monetary_brl,suggested_action
+Loyal (3+ orders),235,0.25,99399.59,0.74,202.0,3.4,422.98,VIP perks; protect their delivery experience
+Repeat - active,1690,1.78,419688.18,3.12,134.3,2.0,248.34,Cross-sell related categories
+Repeat - lapsing,949,1.0,228036.95,1.7,382.7,2.0,240.29,Win-back offer before they drift away
+New - high value,14737,15.56,3953859.18,29.4,93.0,1.0,268.29,Priority: second-purchase nurture while still recent
+New - standard,22110,23.35,1231834.92,9.16,90.8,1.0,55.71,"Low-cost second-purchase email, free-shipping threshold"
+One-time - cooling,18388,19.42,2397203.13,17.82,221.7,1.0,130.37,Reminder with recommendations
+Lost - high value,13793,14.56,3843804.37,28.58,394.3,1.0,278.68,Targeted win-back for the most valuable lapsed buyers
+Lost - low value,22801,24.08,1275703.36,9.49,395.1,1.0,55.95,Low priority: newsletter only

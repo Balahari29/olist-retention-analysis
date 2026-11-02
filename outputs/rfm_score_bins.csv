@@ -1,0 +1,14 @@
+dimension,score,min_value,max_value,customers
+recency_days,1,383.0,602.0,18903
+recency_days,2,270.0,382.0,18710
+recency_days,3,179.0,269.0,19005
+recency_days,4,94.0,178.0,19093
+recency_days,5,1.0,93.0,18992
+frequency_orders,1,1.0,1.0,91829
+frequency_orders,2,2.0,2.0,2639
+frequency_orders,3,3.0,16.0,235
+monetary_brl,1,0.85,39.9,19592
+monetary_brl,2,39.91,69.9,19674
+monetary_brl,3,69.94,109.9,17676
+monetary_brl,4,109.95,179.9,18920
+monetary_brl,5,179.91,13440.0,18841

@@ -1,0 +1,2 @@
+Late deliveries cost about 2.02 stars per review (2.27 vs 4.29 out of 5; 95% CI 1.98 to 2.06 stars), and this is not chance (p < 0.001).
+But 74% of late reviews were written before the parcel arrived; counting only reviews written after delivery, the gap is smaller but still real: 0.76 stars (medium effect, 95% CI 0.69 to 0.83).

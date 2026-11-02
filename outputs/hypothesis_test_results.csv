@@ -1,0 +1,3 @@
+analysis,n_late_reviews,n_on_time_reviews,mean_score_late,mean_score_on_time,mean_difference_late_minus_on_time,bootstrap_ci95_low,bootstrap_ci95_high,bootstrap_samples,mann_whitney_u_late,p_value,rank_biserial,effect_size,prob_on_time_scores_higher
+"main: all reviews, one row per review_id",6365,88701,2.271,4.293,-2.022,-2.06,-1.983,10000,102014716.0,0.0,-0.639,large,0.819
+sensitivity: excluding reviews created before delivery,1624,88482,3.531,4.294,-0.763,-0.835,-0.691,10000,50086852.5,1.1320773255723401e-128,-0.303,medium,0.651
