@@ -11,10 +11,12 @@ sets data types.
                                    │ (customer_unique_id)
                                    ▼ *
   dim_date ──1───*──▶ fact_orders ◀──*───1── dim_customer
-     │ 1                (one row per valid order)
-     │
-     └──────*──▶ fact_order_items ◀──*───1── dim_seller
-                 (one row per item) ◀──*───1── dim_product
+     │ 1                (one row per valid order)   │ 1
+     │                                              │ (R8)
+     └──────*──▶ fact_order_items ◀──*──────────────┘
+                 (one row per item) ◀──*───1── dim_seller
+                                    ◀──*───1── dim_product
+  All arrows are single-direction: filters flow from the 1 side to the * side only.
 
   Static tables, no relationships: retention_cohort_long, distance_vs_delay_bands,
   retention_first_order_late_vs_on_time, rfm_segment_summary   (from outputs/; whole period, not filtered by slicers)
@@ -72,15 +74,27 @@ Create them by hand (turn off "Autodetect new relationships", build_steps.md Ste
 | R5 | `fact_order_items[seller_id]` | `dim_seller[seller_id]` | Many to one (*:1) | Single | Yes |
 | R6 | `fact_order_items[product_id]` | `dim_product[product_id]` | Many to one (*:1) | Single | Yes |
 | R7 (optional) | `fact_orders[delivered_date]` | `dim_date[date_key]` | Many to one (*:1) | Single | **No** (use with `USERELATIONSHIP` for "by delivery date" analysis) |
+| R8 | `fact_order_items[customer_id]` | `dim_customer[customer_id]` | Many to one (*:1) | Single | Yes, **only if R2 is Many to one / Single** (see below) |
 
-**About R2:** each order has its own `customer_id`, so both columns are unique and Power BI may propose **One to one**.
-Change it to **Many to one** with **Single** direction. If Power BI does not allow that, keep One to one: it is safe
-here *because* of the next rule.
+**About R2 and R8 (why the model has no ambiguous paths):** ambiguity means two *active* filter paths between the
+same two tables. With every relationship single-direction, a filter only flows from a "1" side to a "*" side, so:
+- `dim_date` reaches `fact_order_items` only directly (R4). The route `dim_date → fact_orders → dim_customer →
+  fact_order_items` is blocked at its second step: `fact_orders` is the *many* side of R2, and a single-direction
+  relationship never passes a filter from the many side back to the one side.
+- `dim_customer` reaches `fact_order_items` only through R8 (the two fact tables are not related), and
+  `rfm_customer_segments` reaches it only via `dim_customer` (R3 then R8).
+
+**The one condition:** R2 must really be **Many to one, Single**. Each order has its own `customer_id`, so both R2
+columns are unique and Power BI may *propose* **One to one**, which is **always both directions**. A both-directions R2
+opens a second path, `dim_date → fact_orders → dim_customer → fact_order_items`, next to the direct R4: that is an
+ambiguity, and Power BI would refuse R8 or force one path inactive. So: change R2 to **Many to one / Single**
+(build_steps.md, Step 4). If Power BI will not allow that and R2 stays One to one, create R8 as **inactive** (untick
+*Make this relationship active*); customer slicers then do not filter the Seller Performance page.
+
+**What R8 adds:** customer filters (state, RFM segment) also filter `fact_order_items`, i.e. the Seller Performance page
+then shows "orders shipped to customers in the selected state or segment".
 
 **Deliberately NOT related (and why):**
-- `fact_order_items[customer_id]` → `dim_customer`: with R1, R2 and R4 it would create two filter paths from
-  `dim_date` to `fact_order_items`, and Power BI would deactivate one without telling you. Customer filters belong on
-  pages built on `fact_orders`.
 - `fact_orders` ↔ `fact_order_items`: no fact-to-fact joins. The order-level delivery and review columns are already
   copied onto each item (`in_delivery_scope`, `is_late`, `delay_days`, `review_score`).
 - Static tables (`retention_cohort_long`, `distance_vs_delay_bands`, `retention_first_order_late_vs_on_time`, `rfm_segment_summary`): their

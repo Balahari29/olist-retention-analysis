@@ -64,14 +64,17 @@ When all 11 queries are listed: **Home → Close & Apply**. Power BI loads the d
 
 ## Step 4: Create the relationships
 1. Click **Model view** (the third icon on the left edge).
-2. **Home → Manage relationships → New relationship**. For each row R1-R6 in `model_spec.md` §4:
+2. **Home → Manage relationships → New relationship**. For each row R1-R6 and R8 in `model_spec.md` §4:
    - top drop-down: the **many** table (e.g. `fact_orders`) and click the key column (`purchase_date`)
    - bottom drop-down: the **one** table (`dim_date`) and click its key (`date_key`)
    - *Cardinality*: **Many to one (*:1)**; *Cross filter direction*: **Single**; tick **Make this relationship active**
    - **Save**.
-3. For R2 (`fact_orders[customer_id]` → `dim_customer[customer_id]`) Power BI may pick **One to one**: change it to
-   **Many to one** and **Single**. If it refuses, keep One to one (safe in this model, see `model_spec.md` §4).
-4. Do **not** connect `fact_order_items[customer_id]` to anything, and do not connect the static tables.
+3. **Create R2 before R8.** For R2 (`fact_orders[customer_id]` → `dim_customer[customer_id]`) Power BI may pick
+   **One to one**, which always filters in **both** directions. Change it to **Many to one** and **Single**.
+4. Then create R8 (`fact_order_items[customer_id]` → `dim_customer[customer_id]`, Many to one, Single, active).
+   If R2 had to stay One to one, create R8 **inactive** (untick *Make this relationship active*): a both-directions R2
+   plus an active R8 would give `dim_date` two routes to `fact_order_items` (see `model_spec.md` §4).
+5. Do not connect the static tables, and do not connect `fact_orders` to `fact_order_items` directly.
 
 *Why:* relationships let a filter on a dimension (a date, a state, a seller) flow to the facts. "Single" direction
 means filters flow one way only (dimension → fact), which keeps results predictable.

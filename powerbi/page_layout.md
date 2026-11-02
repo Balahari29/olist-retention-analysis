@@ -27,7 +27,9 @@ from the `outputs/` file named in the *Source* column. Measures are defined in `
 | Category | `dim_product[category_english]` | Dropdown with search | Seller Performance | – |
 
 **Rules readers must know (put them in a small grey note under the slicers):**
-- *Customer state* filters `fact_orders` only; it has no effect on the Seller Performance page (by design, see model_spec.md §4).
+- *Customer state* and *RFM segment* filter both fact tables (relationships R2 and R8). On the Seller Performance page they
+  mean "orders shipped to customers in the selected state/segment"; they are not placed there by default, to keep that page
+  about sellers. (If R8 had to be made inactive, see model_spec.md §4, they do not reach that page at all.)
 - Visuals built on **static tables** (cohort matrix, distance bands, first-order test, segment summary) show the whole
   period and ignore slicers. Their subtitles say **"Whole period 2017-01 to 2018-08, not filtered by slicers."**
 - RFM segments are scored once over the whole window; the date slicer does not re-score them.
