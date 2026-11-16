@@ -1,0 +1,86 @@
+/// Calendar, one row per day 2017-01-01 to 2018-12-31 (MySQL view dim_date). Marked as date table.
+table dim_date
+	dataCategory: Time
+	lineageTag: 09d267c2-550d-5e30-b979-3b7062d49a11
+
+	column date_key
+		dataType: dateTime
+		formatString: yyyy-mm-dd
+		isKey
+		lineageTag: ff854489-f102-5895-94b3-889fa7ba9805
+		summarizeBy: none
+		sourceColumn: date_key
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column year_number
+		dataType: int64
+		lineageTag: 05b8a355-a935-53a5-ab19-2195658b1eb1
+		summarizeBy: none
+		sourceColumn: year_number
+
+	column quarter_number
+		dataType: int64
+		lineageTag: 5aeda215-ee5f-59bd-8cf5-155105cafa18
+		summarizeBy: none
+		sourceColumn: quarter_number
+
+	column month_number
+		dataType: int64
+		lineageTag: 21a7ff82-a01c-57d3-adff-9ecf6da10a37
+		summarizeBy: none
+		sourceColumn: month_number
+
+	column month_name
+		dataType: string
+		lineageTag: 411dd267-aa88-5b41-ad5a-84bec65fcefe
+		summarizeBy: none
+		sourceColumn: month_name
+		sortByColumn: month_number
+
+	column year_month_label
+		dataType: string
+		lineageTag: faef531c-1403-50f1-a39c-6ba21e642c44
+		summarizeBy: none
+		sourceColumn: year_month_label
+		sortByColumn: month_start
+
+	column month_start
+		dataType: dateTime
+		formatString: yyyy-mm
+		lineageTag: 6b95a2a0-07c9-5925-bb66-872be492c295
+		summarizeBy: none
+		sourceColumn: month_start
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column weekday_number
+		dataType: int64
+		lineageTag: 4c163b94-5afb-52aa-9db6-dbc94944cea8
+		summarizeBy: none
+		sourceColumn: weekday_number
+
+	column weekday_name
+		dataType: string
+		lineageTag: 3ba229d6-d963-58cf-b0d7-6fceacad3650
+		summarizeBy: none
+		sourceColumn: weekday_name
+		sortByColumn: weekday_number
+
+	column is_weekend
+		dataType: int64
+		lineageTag: b46a34dd-fb43-5c7e-b73c-66b14d70d42f
+		summarizeBy: none
+		sourceColumn: is_weekend
+
+	partition dim_date = m
+		mode: import
+		source =
+				let
+				    Source = MySQL.Database(#"MySQL Server", #"MySQL Database", [ReturnSingleDatabase = true]),
+				    View = Source{[Schema = #"MySQL Database", Item = "dim_date"]}[Data],
+				    Typed = Table.TransformColumnTypes(View, {{"date_key", type date}, {"year_number", Int64.Type}, {"quarter_number", Int64.Type}, {"month_number", Int64.Type}, {"month_name", type text}, {"year_month_label", type text}, {"month_start", type date}, {"weekday_number", Int64.Type}, {"weekday_name", type text}, {"is_weekend", Int64.Type}})
+				in
+				    Typed
+
+	annotation PBI_ResultType = Table

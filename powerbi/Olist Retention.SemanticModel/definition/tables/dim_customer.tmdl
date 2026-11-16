@@ -1,0 +1,99 @@
+/// One row per customer_id (1:1 with orders). customer_unique_id = the person.
+table dim_customer
+	lineageTag: 2ab75418-41f1-5649-b2fc-e7bb22e2e8b8
+
+	column customer_id
+		dataType: string
+		isHidden
+		lineageTag: 87a8da5d-4faf-5fce-b69b-1d78b6c2b789
+		summarizeBy: none
+		sourceColumn: customer_id
+
+	column customer_unique_id
+		dataType: string
+		lineageTag: dcfb1d1d-af09-53e3-9654-335c6be5c442
+		summarizeBy: none
+		sourceColumn: customer_unique_id
+
+	column customer_zip_code_prefix
+		dataType: string
+		lineageTag: 0c6b48fd-7e0f-5164-abaf-8df1f5f52b85
+		summarizeBy: none
+		sourceColumn: customer_zip_code_prefix
+
+	column customer_city
+		dataType: string
+		lineageTag: 4f50fe05-460d-5a6b-861e-999d64a3dee5
+		summarizeBy: none
+		sourceColumn: customer_city
+
+	column customer_state
+		dataType: string
+		dataCategory: StateOrProvince
+		lineageTag: 1913b2af-6e56-57af-bb5b-9badbd07370b
+		summarizeBy: none
+		sourceColumn: customer_state
+
+	column customer_latitude
+		dataType: double
+		dataCategory: Latitude
+		lineageTag: c78099e2-df46-56d7-95cb-82fd6402c602
+		summarizeBy: none
+		sourceColumn: customer_latitude
+
+	column customer_longitude
+		dataType: double
+		dataCategory: Longitude
+		lineageTag: 8c37b070-6519-5216-bc28-739f4a0f1d53
+		summarizeBy: none
+		sourceColumn: customer_longitude
+
+	column cohort_month
+		dataType: dateTime
+		formatString: yyyy-mm
+		lineageTag: d1f7102f-96e8-5f45-9b65-c9ee5ac4f893
+		summarizeBy: none
+		sourceColumn: cohort_month
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column person_valid_orders
+		dataType: int64
+		lineageTag: 9a916560-7c65-58f6-b655-1316c3905fa3
+		summarizeBy: none
+		sourceColumn: person_valid_orders
+
+	column is_repeat_customer
+		dataType: int64
+		lineageTag: 6e0a9f0a-fac4-53f2-9a79-4307a3a5f531
+		summarizeBy: none
+		sourceColumn: is_repeat_customer
+
+	column 'Customer Type' = IF ( dim_customer[is_repeat_customer] = 1, "Repeat", "One-time" )
+		dataType: string
+		lineageTag: f6f69009-85e9-5bb1-9f10-8aa10dd6b973
+		summarizeBy: none
+
+	column 'Order Count Band' = SWITCH ( TRUE (), dim_customer[person_valid_orders] = 1, "1 order", dim_customer[person_valid_orders] = 2, "2 orders", dim_customer[person_valid_orders] = 3, "3 orders", "4+ orders" )
+		dataType: string
+		lineageTag: 62f906ed-5683-5c18-9de5-67a9442d95d4
+		summarizeBy: none
+		sortByColumn: 'Order Count Band Sort'
+
+	column 'Order Count Band Sort' = MIN ( dim_customer[person_valid_orders], 4 )
+		dataType: int64
+		isHidden
+		lineageTag: e86821bf-c89b-563f-bd67-4fd0d9caf873
+		summarizeBy: none
+
+	partition dim_customer = m
+		mode: import
+		source =
+				let
+				    Source = MySQL.Database(#"MySQL Server", #"MySQL Database", [ReturnSingleDatabase = true]),
+				    View = Source{[Schema = #"MySQL Database", Item = "dim_customer"]}[Data],
+				    Typed = Table.TransformColumnTypes(View, {{"customer_id", type text}, {"customer_unique_id", type text}, {"customer_zip_code_prefix", type text}, {"customer_city", type text}, {"customer_state", type text}, {"customer_latitude", type number}, {"customer_longitude", type number}, {"cohort_month", type date}, {"person_valid_orders", Int64.Type}, {"is_repeat_customer", Int64.Type}})
+				in
+				    Typed
+
+	annotation PBI_ResultType = Table

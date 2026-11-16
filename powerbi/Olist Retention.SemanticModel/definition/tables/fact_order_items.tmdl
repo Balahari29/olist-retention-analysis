@@ -1,0 +1,110 @@
+/// One row per item of a valid order (111,752). Order-level delivery/review values repeat on each item.
+table fact_order_items
+	lineageTag: 9cbfbef7-fd18-5e81-afe1-aeecff37aa6a
+
+	column order_id
+		dataType: string
+		isHidden
+		lineageTag: ee7700fa-fa09-54da-b794-c3f3f447bd4a
+		summarizeBy: none
+		sourceColumn: order_id
+
+	column order_item_id
+		dataType: int64
+		isHidden
+		lineageTag: 70b62e9d-5978-5d06-b857-fff40c940887
+		summarizeBy: none
+		sourceColumn: order_item_id
+
+	column product_id
+		dataType: string
+		isHidden
+		lineageTag: bb005647-c029-509e-91be-1468abac8808
+		summarizeBy: none
+		sourceColumn: product_id
+
+	column seller_id
+		dataType: string
+		isHidden
+		lineageTag: 4149eb65-7595-52b5-8e30-a349e3cd9d15
+		summarizeBy: none
+		sourceColumn: seller_id
+
+	column customer_id
+		dataType: string
+		isHidden
+		lineageTag: aae83470-d336-53c7-9aaf-1f3f63d7acef
+		summarizeBy: none
+		sourceColumn: customer_id
+
+	column purchase_date
+		dataType: dateTime
+		formatString: yyyy-mm-dd
+		isHidden
+		lineageTag: 86c0f1b6-3003-5b2d-b95e-77e34120e11a
+		summarizeBy: none
+		sourceColumn: purchase_date
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column price
+		dataType: decimal
+		formatString: R$ #,0.00
+		isHidden
+		lineageTag: 9323627d-5ed6-51f2-bfc1-718357e0a709
+		summarizeBy: none
+		sourceColumn: price
+
+	column freight_value
+		dataType: decimal
+		formatString: R$ #,0.00
+		lineageTag: 33f92e7c-79b4-584a-abb6-0f4dcd11e4fa
+		summarizeBy: none
+		sourceColumn: freight_value
+
+	column shipping_limit_date
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: fa9e17d8-e23d-55b3-b87a-29e30d3eccfa
+		summarizeBy: none
+		sourceColumn: shipping_limit_date
+
+	column in_delivery_scope
+		dataType: int64
+		isHidden
+		lineageTag: 5425a9d3-a622-5db4-be7c-6bc37605e56a
+		summarizeBy: none
+		sourceColumn: in_delivery_scope
+
+	column is_late
+		dataType: int64
+		isHidden
+		lineageTag: 4393f7d9-615e-5af6-a42a-cdc039194761
+		summarizeBy: none
+		sourceColumn: is_late
+
+	column delay_days
+		dataType: int64
+		isHidden
+		lineageTag: c456d5b8-8617-5663-870c-473e8a89663d
+		summarizeBy: none
+		sourceColumn: delay_days
+
+	column review_score
+		dataType: int64
+		isHidden
+		lineageTag: c3070938-1b7c-575d-ae88-9709297cfbd8
+		summarizeBy: none
+		sourceColumn: review_score
+
+	partition fact_order_items = m
+		mode: import
+		source =
+				let
+				    Source = MySQL.Database(#"MySQL Server", #"MySQL Database", [ReturnSingleDatabase = true]),
+				    View = Source{[Schema = #"MySQL Database", Item = "fact_order_items"]}[Data],
+				    Typed = Table.TransformColumnTypes(View, {{"order_id", type text}, {"order_item_id", Int64.Type}, {"product_id", type text}, {"seller_id", type text}, {"customer_id", type text}, {"purchase_date", type date}, {"price", Currency.Type}, {"freight_value", Currency.Type}, {"shipping_limit_date", type datetime}, {"in_delivery_scope", Int64.Type}, {"is_late", Int64.Type}, {"delay_days", Int64.Type}, {"review_score", Int64.Type}})
+				in
+				    Typed
+
+	annotation PBI_ResultType = Table

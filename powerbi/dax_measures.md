@@ -457,7 +457,18 @@ and `[Excess Late Orders]`. **Expected: decile 1 → 853 late orders, 15.56 % sh
 | Satisfaction | Avg Review, Avg Review (delivered) |
 | Sellers | Total Sellers, Ranked Sellers, Seller Delivered Orders, Seller Late Orders, Seller Late %, Seller Late % (pairs), Excess Late Orders, Seller Late Rate Rank, Excess Late Rank, Seller Avg Review, Seller Avg Delay (days), Seller Revenue (R$), Share of Seller Late Orders, Seller Detail Title |
 | Sellers\Helpers | Late Orders (seller sum), Delivered Orders (seller sum) |
-| Formatting | Colour - Late vs Platform, Colour - Seller Late vs Platform |
+| Formatting | Colour - Late vs Platform, Colour - Seller Late vs Platform, Colour - Seller Late (pairs) vs Platform, Colour - Late Bucket |
+
+Two colour measures were added in Stage 4 for the report (same orange/blue rule as section 7):
+```dax
+Colour - Seller Late (pairs) vs Platform =
+IF ( [Seller Late % (pairs)] > [Platform Late Rate], "#EB6834", "#2A78D6" )
+
+Colour - Late Bucket =
+IF ( MAX ( fact_orders[delay_bucket_order] ) >= 3, "#EB6834", "#2A78D6" )
+```
+The first colours the decile chart (groups of sellers, so the pair-based rate). The second colours the late delay
+buckets (1-3, 4-7, 7+ days late; `delay_bucket_order` 3-5) orange.
 
 ### 9.6 Format strings for the additions
 | Measure | Format |

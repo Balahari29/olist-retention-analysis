@@ -1,0 +1,163 @@
+/// One row per valid order (97,905). Order-level revenue, delivery and review.
+table fact_orders
+	lineageTag: 674828ed-9e2f-5d1b-a4f4-193222d560e7
+
+	column order_id
+		dataType: string
+		lineageTag: 85a1e6cc-82ac-5a23-8c8f-41d7aefb629d
+		summarizeBy: none
+		sourceColumn: order_id
+
+	column customer_id
+		dataType: string
+		isHidden
+		lineageTag: cb3fdae6-f914-5f5f-b8cd-7ce5b7225a98
+		summarizeBy: none
+		sourceColumn: customer_id
+
+	column purchase_date
+		dataType: dateTime
+		formatString: yyyy-mm-dd
+		isHidden
+		lineageTag: 9095660a-4b76-5496-ac22-4c07401bdfdc
+		summarizeBy: none
+		sourceColumn: purchase_date
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column order_status
+		dataType: string
+		lineageTag: 921e21ba-3da6-5c87-95be-4758e1ff7ed1
+		summarizeBy: none
+		sourceColumn: order_status
+
+	column item_count
+		dataType: int64
+		lineageTag: f67d155e-baa3-5243-84fd-b19b1e690588
+		summarizeBy: none
+		sourceColumn: item_count
+
+	column order_revenue
+		dataType: decimal
+		formatString: R$ #,0.00
+		lineageTag: 157b74cf-fd8e-5189-a1e7-8f4bffbeeccd
+		summarizeBy: none
+		sourceColumn: order_revenue
+
+	column order_freight
+		dataType: decimal
+		formatString: R$ #,0.00
+		lineageTag: c5b69fbe-4e18-590c-8642-f11a1214727b
+		summarizeBy: none
+		sourceColumn: order_freight
+
+	column payment_total
+		dataType: decimal
+		formatString: R$ #,0.00
+		lineageTag: 7a6fe876-7392-52ff-8fb7-f90dc5246624
+		summarizeBy: none
+		sourceColumn: payment_total
+
+	column in_delivery_scope
+		dataType: int64
+		isHidden
+		lineageTag: b58416a7-2e4f-53a3-bb9c-295c16b9af0b
+		summarizeBy: none
+		sourceColumn: in_delivery_scope
+
+	column delivered_date
+		dataType: dateTime
+		formatString: yyyy-mm-dd
+		lineageTag: 9325a8f0-e374-5060-a080-ba9907504f73
+		summarizeBy: none
+		sourceColumn: delivered_date
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column estimated_date
+		dataType: dateTime
+		formatString: yyyy-mm-dd
+		lineageTag: 9b09d955-f717-5f12-95c5-1ed0a9b416d2
+		summarizeBy: none
+		sourceColumn: estimated_date
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column delay_days
+		dataType: int64
+		isHidden
+		lineageTag: 121f5503-1297-5fec-af9a-7c4aab05fa76
+		summarizeBy: none
+		sourceColumn: delay_days
+
+	column delay_bucket
+		dataType: string
+		lineageTag: 965d13ff-f477-57de-b787-2ecdd77996a7
+		summarizeBy: none
+		sourceColumn: delay_bucket
+		sortByColumn: delay_bucket_order
+
+	column delay_bucket_order
+		dataType: int64
+		lineageTag: d2dd06b2-6f0c-5a12-a8f2-9c97732f6b4a
+		summarizeBy: none
+		sourceColumn: delay_bucket_order
+
+	column is_on_time
+		dataType: int64
+		isHidden
+		lineageTag: f4b4f01f-f7ba-53e3-a852-33c52f9fe985
+		summarizeBy: none
+		sourceColumn: is_on_time
+
+	column is_late
+		dataType: int64
+		isHidden
+		lineageTag: a490a064-3452-5afd-bb98-091b37c92237
+		summarizeBy: none
+		sourceColumn: is_late
+
+	column delivery_days
+		dataType: int64
+		isHidden
+		lineageTag: c89e50e0-eaff-5438-a6f0-7b1cabe1b60f
+		summarizeBy: none
+		sourceColumn: delivery_days
+
+	column flag_pickup_before_approval
+		dataType: int64
+		lineageTag: abed48af-8091-53a1-8622-294d98920707
+		summarizeBy: none
+		sourceColumn: flag_pickup_before_approval
+
+	column approval_to_pickup_days
+		dataType: double
+		lineageTag: a7d67714-df7a-55ec-95ee-304c55689651
+		summarizeBy: none
+		sourceColumn: approval_to_pickup_days
+
+	column review_id
+		dataType: string
+		isHidden
+		lineageTag: 61a6d0c1-9fbe-5597-a138-fc55fc97e181
+		summarizeBy: none
+		sourceColumn: review_id
+
+	column review_score
+		dataType: int64
+		isHidden
+		lineageTag: 41b27ed2-0884-5b74-b07a-f538a0a154c9
+		summarizeBy: none
+		sourceColumn: review_score
+
+	partition fact_orders = m
+		mode: import
+		source =
+				let
+				    Source = MySQL.Database(#"MySQL Server", #"MySQL Database", [ReturnSingleDatabase = true]),
+				    View = Source{[Schema = #"MySQL Database", Item = "fact_orders"]}[Data],
+				    Typed = Table.TransformColumnTypes(View, {{"order_id", type text}, {"customer_id", type text}, {"purchase_date", type date}, {"order_status", type text}, {"item_count", Int64.Type}, {"order_revenue", Currency.Type}, {"order_freight", Currency.Type}, {"payment_total", Currency.Type}, {"in_delivery_scope", Int64.Type}, {"delivered_date", type date}, {"estimated_date", type date}, {"delay_days", Int64.Type}, {"delay_bucket", type text}, {"delay_bucket_order", Int64.Type}, {"is_on_time", Int64.Type}, {"is_late", Int64.Type}, {"delivery_days", Int64.Type}, {"flag_pickup_before_approval", Int64.Type}, {"approval_to_pickup_days", type number}, {"review_id", type text}, {"review_score", Int64.Type}})
+				in
+				    Typed
+
+	annotation PBI_ResultType = Table

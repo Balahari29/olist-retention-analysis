@@ -1,0 +1,15 @@
+/// Month offsets 0-19 for the cohort matrix columns (disconnected table).
+table 'Cohort Month Offset'
+	lineageTag: 089351d6-8319-5475-b97f-5df79cb6446a
+
+	column month_offset
+		dataType: int64
+		formatString: 0
+		isNameInferred
+		lineageTag: f6d15a3e-c036-5793-8ecf-b5a221f3302f
+		summarizeBy: none
+		sourceColumn: [month_offset]
+
+	partition 'Cohort Month Offset' = calculated
+		mode: import
+		source = SELECTCOLUMNS ( GENERATESERIES ( 0, 19, 1 ), "month_offset", [Value] )

@@ -1,0 +1,72 @@
+/// Sellers with at least one item in a valid order; ranking columns only for 30+ delivered orders.
+table dim_seller
+	lineageTag: dc06afa4-45f0-5bfb-a42f-8a616eaf7d38
+
+	column seller_id
+		dataType: string
+		lineageTag: 4d97b449-c4c9-5cd6-a569-02eb620bd8c8
+		summarizeBy: none
+		sourceColumn: seller_id
+
+	column seller_zip_code_prefix
+		dataType: string
+		lineageTag: 27bd0c1a-9fc7-5ceb-a9fa-c4ea2e18ca4f
+		summarizeBy: none
+		sourceColumn: seller_zip_code_prefix
+
+	column seller_city
+		dataType: string
+		lineageTag: 3d9d4359-1491-582a-9853-5d7167b35a1e
+		summarizeBy: none
+		sourceColumn: seller_city
+
+	column seller_state
+		dataType: string
+		dataCategory: StateOrProvince
+		lineageTag: f28d335f-cf6c-5657-910b-b82dbc1469f2
+		summarizeBy: none
+		sourceColumn: seller_state
+
+	column seller_latitude
+		dataType: double
+		dataCategory: Latitude
+		lineageTag: af7a952e-579f-5204-9d24-4a3c8a16a750
+		summarizeBy: none
+		sourceColumn: seller_latitude
+
+	column seller_longitude
+		dataType: double
+		dataCategory: Longitude
+		lineageTag: b9c8c74f-e5ad-5154-9373-fd2bbc67a0fe
+		summarizeBy: none
+		sourceColumn: seller_longitude
+
+	column late_rate_rank
+		dataType: int64
+		lineageTag: 771e275f-b886-50fc-9ffb-9fe08c9cb993
+		summarizeBy: none
+		sourceColumn: late_rate_rank
+
+	column late_rate_decile
+		dataType: int64
+		lineageTag: 1ba2c6e8-94eb-5bc9-9698-72d8d2465612
+		summarizeBy: none
+		sourceColumn: late_rate_decile
+
+	column is_ranked_30plus_orders
+		dataType: int64
+		lineageTag: 101ac3b8-8f17-50f0-b7ed-cc8eac88cc7f
+		summarizeBy: none
+		sourceColumn: is_ranked_30plus_orders
+
+	partition dim_seller = m
+		mode: import
+		source =
+				let
+				    Source = MySQL.Database(#"MySQL Server", #"MySQL Database", [ReturnSingleDatabase = true]),
+				    View = Source{[Schema = #"MySQL Database", Item = "dim_seller"]}[Data],
+				    Typed = Table.TransformColumnTypes(View, {{"seller_id", type text}, {"seller_zip_code_prefix", type text}, {"seller_city", type text}, {"seller_state", type text}, {"seller_latitude", type number}, {"seller_longitude", type number}, {"late_rate_rank", Int64.Type}, {"late_rate_decile", Int64.Type}, {"is_ranked_30plus_orders", Int64.Type}})
+				in
+				    Typed
+
+	annotation PBI_ResultType = Table

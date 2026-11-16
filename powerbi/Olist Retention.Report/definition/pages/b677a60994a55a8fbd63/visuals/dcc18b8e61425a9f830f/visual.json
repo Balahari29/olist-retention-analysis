@@ -1,0 +1,173 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
+  "name": "dcc18b8e61425a9f830f",
+  "position": {
+    "x": 644,
+    "y": 472,
+    "z": 14000,
+    "height": 236,
+    "width": 620,
+    "tabOrder": 14000
+  },
+  "visual": {
+    "visualType": "tableEx",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "Category Revenue Rank"
+                }
+              },
+              "queryRef": "_Measures.Category Revenue Rank",
+              "nativeQueryRef": "Category Revenue Rank",
+              "displayName": "Rank"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "dim_product"
+                    }
+                  },
+                  "Property": "category_english"
+                }
+              },
+              "queryRef": "dim_product.category_english",
+              "nativeQueryRef": "category_english",
+              "displayName": "Category"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "Item Revenue (R$)"
+                }
+              },
+              "queryRef": "_Measures.Item Revenue (R$)",
+              "nativeQueryRef": "Item Revenue (R$)",
+              "displayName": "Revenue (R$)"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "Category Revenue Share %"
+                }
+              },
+              "queryRef": "_Measures.Category Revenue Share %",
+              "nativeQueryRef": "Category Revenue Share %",
+              "displayName": "Share"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "Category Cumulative Revenue %"
+                }
+              },
+              "queryRef": "_Measures.Category Cumulative Revenue %",
+              "nativeQueryRef": "Category Cumulative Revenue %",
+              "displayName": "Cumulative"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "Item Orders"
+                }
+              },
+              "queryRef": "_Measures.Item Orders",
+              "nativeQueryRef": "Item Orders",
+              "displayName": "Orders"
+            }
+          ]
+        }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Measure": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "_Measures"
+                  }
+                },
+                "Property": "Item Revenue (R$)"
+              }
+            },
+            "direction": "Descending"
+          }
+        ],
+        "isDefaultSort": false
+      }
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Top performing categories'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "subTitle": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Ranked by item revenue'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

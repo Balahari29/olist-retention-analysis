@@ -1,0 +1,64 @@
+/// Products with English category names.
+table dim_product
+	lineageTag: ce9247b5-6952-5264-81f7-1fa81c039b80
+
+	column product_id
+		dataType: string
+		isHidden
+		lineageTag: ec81846b-f573-5bb0-8a12-7bdfe05501c0
+		summarizeBy: none
+		sourceColumn: product_id
+
+	column category_portuguese
+		dataType: string
+		lineageTag: 072ec528-6487-5797-a710-d40fae86ffbd
+		summarizeBy: none
+		sourceColumn: category_portuguese
+
+	column category_english
+		dataType: string
+		lineageTag: 4a7da7e9-4903-5f9d-84b7-dba181514f51
+		summarizeBy: none
+		sourceColumn: category_english
+
+	column product_photos_qty
+		dataType: int64
+		lineageTag: df7bafdd-84fa-531d-b658-396aea2fa376
+		summarizeBy: none
+		sourceColumn: product_photos_qty
+
+	column product_weight_g
+		dataType: int64
+		lineageTag: 2dead249-858b-5c66-b21d-bae34e512030
+		summarizeBy: none
+		sourceColumn: product_weight_g
+
+	column product_length_cm
+		dataType: int64
+		lineageTag: 4f6a55dd-d53b-5c3f-a8aa-6c39350d1289
+		summarizeBy: none
+		sourceColumn: product_length_cm
+
+	column product_height_cm
+		dataType: int64
+		lineageTag: 24c6d04e-d50a-546a-925a-7299ae133cf2
+		summarizeBy: none
+		sourceColumn: product_height_cm
+
+	column product_width_cm
+		dataType: int64
+		lineageTag: 6723fa8c-db99-52db-b429-2c69fc90320c
+		summarizeBy: none
+		sourceColumn: product_width_cm
+
+	partition dim_product = m
+		mode: import
+		source =
+				let
+				    Source = MySQL.Database(#"MySQL Server", #"MySQL Database", [ReturnSingleDatabase = true]),
+				    View = Source{[Schema = #"MySQL Database", Item = "dim_product"]}[Data],
+				    Typed = Table.TransformColumnTypes(View, {{"product_id", type text}, {"category_portuguese", type text}, {"category_english", type text}, {"product_photos_qty", Int64.Type}, {"product_weight_g", Int64.Type}, {"product_length_cm", Int64.Type}, {"product_height_cm", Int64.Type}, {"product_width_cm", Int64.Type}})
+				in
+				    Typed
+
+	annotation PBI_ResultType = Table

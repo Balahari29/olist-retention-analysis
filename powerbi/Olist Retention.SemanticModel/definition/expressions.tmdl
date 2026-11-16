@@ -1,0 +1,11 @@
+/// MySQL host (and :port if not 3306). Change in Transform data > Edit parameters.
+expression 'MySQL Server' = "localhost" meta [IsParameterQuery = true, Type = "Text", IsParameterQueryRequired = true]
+	lineageTag: ee2aa072-1349-5d0d-b9be-261bba38aaa4
+
+	annotation PBI_ResultType = Text
+
+/// MySQL database that holds the Power BI views (sql/06_views_for_powerbi.sql).
+expression 'MySQL Database' = "olist" meta [IsParameterQuery = true, Type = "Text", IsParameterQueryRequired = true]
+	lineageTag: e33a9aca-2eb7-5a26-9999-cfaa26e04e85
+
+	annotation PBI_ResultType = Text
