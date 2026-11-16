@@ -2,9 +2,15 @@
 data/raw/*
 !data/raw/.gitkeep
 
-# Secrets
+# Secrets (only the template .env.example is committed)
 .env
+.env.*
+!.env.example
 kaggle.json
+*credentials*
+*secret*
+*.pem
+*.key
 
 # Python
 .venv/
@@ -16,6 +22,17 @@ __pycache__/
 *.pbix.bak
 powerbi/*Backup*
 ~$*.xlsx
+
+# Power BI Project (PBIP): per-user settings and the local data cache (holds imported data) are never committed
+**/.pbi/localSettings.json
+**/.pbi/cache.abf
+*.abf
+
+# Generated temporary files
+*.tmp
+*.log
+Thumbs.db
+desktop.ini
 
 # OS / editor
 .DS_Store
