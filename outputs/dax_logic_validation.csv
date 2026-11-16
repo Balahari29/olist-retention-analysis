@@ -1,0 +1,55 @@
+folder,measure,context,dax_logic_value,benchmark,pass
+Revenue,Total Revenue (R$),no filter,13449529.68,13449529.68,True
+Revenue,Orders,no filter,97905.0,97905.0,True
+Revenue,AOV (R$),no filter,137.37326673816455,137.3733,True
+Revenue,Item Revenue (R$),no filter,13449529.68,13449529.68,True
+Revenue,Revenue MoM %,month = 2017-11,52.058941171192174,52.0589,True
+Revenue,Revenue MoM %,month = 2018-08,-3.3237697684650955,-3.3238,True
+Revenue,Revenue MoM % (every month),max abs diff vs revenue_mom.csv (2 dp),0.0,0.0,True
+Revenue,AOV (R$) by month,max abs diff vs revenue_mom.csv (2 dp),0.0,0.0,True
+Revenue,Item Revenue (R$) by category,max abs diff vs revenue_pareto_category.csv,0.0,0.0,True
+Revenue,Item Orders (distinct order_id) by category,max abs diff vs revenue_pareto_category.csv,0.0,0.0,True
+Revenue,Category Cumulative Revenue %,max abs diff vs revenue_pareto_category.csv (2 dp),0.0,0.0,True
+Revenue,Categories for 80% revenue,revenue_pareto_summary.csv,18.0,18.0,True
+Revenue,Total Revenue (R$) by customer state,max abs diff vs revenue_pareto_state.csv,0.0,0.0,True
+Revenue,State Cumulative Revenue %,max abs diff vs revenue_pareto_state.csv (2 dp),0.0,0.0,True
+Revenue,States for 80% revenue,revenue_pareto_summary.csv,7.0,7.0,True
+Customers,Customers,no filter,94703.0,94703.0,True
+Customers,Repeat Customers,no filter (retention_repeat_customers.csv),2874.0,2874.0,True
+Customers,One-time Customers,no filter (retention_orders_per_customer.csv),91829.0,91829.0,True
+Customers,Repeat Customer %,no filter,3.0347507470724264,3.0348,True
+Customers,Orders per Customer,"no filter (= 97,905 / 94,703)",1.0338109669176268,1.0338109669176268,True
+Customers,Customers by person_valid_orders,max abs diff vs retention_orders_per_customer.csv,0.0,0.0,True
+Customers,dim_customer[person_valid_orders] = orders per person,rows that differ,0.0,0.0,True
+Customers,Cohort cells (cohort x offset),rows vs retention_cohort_long.csv,210.0,210.0,True
+Customers,Cohort cells missing on either side,outer join,0.0,0.0,True
+Customers,Cohort Active Customers,max abs diff vs retention_cohort_long.csv,0.0,0.0,True
+Customers,Cohort Retention %,max abs diff vs retention_cohort_long.csv (2 dp),0.0,0.0,True
+Delivery,Delivered Orders,no filter,96201.0,96201.0,True
+Delivery,Late Orders,no filter (delivery_kpis_overall.csv),6531.0,6531.0,True
+Delivery,On-Time %,no filter,93.2110892818162,93.2111,True
+Delivery,Late %,no filter,6.788910718183803,6.7889,True
+Delivery,Avg Delay (days),no filter,-11.807060217669255,-11.8071,True
+Delivery,Avg Delivery Days,no filter,12.47675180091683,12.4768,True
+Delivery,On-Time % by month,max abs diff vs delivery_ontime_by_month.csv (2 dp),0.0,0.0,True
+Delivery,Late % by customer state,max abs diff vs delivery_ontime_by_state.csv (2 dp),0.0,0.0,True
+Delivery,Delivered Orders by delay bucket,max abs diff vs delivery_buckets_vs_review.csv,0.0,0.0,True
+Delivery,Avg Review (delivered) by delay bucket,max abs diff vs delivery_buckets_vs_review.csv (2 dp),0.0,0.0,True
+Satisfaction,Avg Review,no filter,4.117320792772027,4.1173,True
+Satisfaction,Avg Review (delivered),no filter,4.156302978295904,4.1563,True
+Sellers,Total Sellers,no filter (dim_seller rows with items),3029.0,3029.0,True
+Sellers,Ranked Sellers,is_ranked_30plus_orders = 1 (seller_scorecard_totals.csv),625.0,625.0,True
+Sellers,"Seller Late % (existing, DISTINCTCOUNT across selection)",ranked sellers,6.7937414628088915,6.7331,False
+Sellers,"Seller Late % (pairs, SUMX per seller)",ranked sellers,6.733142583473531,6.7331,True
+Sellers,Seller Delivered Orders (existing DISTINCTCOUNT),"ranked sellers vs 81,433 pairs",80530.0,81433.0,False
+Sellers,Delivered Orders (seller sum),"ranked sellers vs 81,433 pairs",81433.0,81433.0,True
+Sellers,Excess Late Orders,ranked sellers,-45.413665138615556,-45.41,True
+Sellers,Excess Late Orders,top seller (max),51.70050207378303,51.7,True
+Sellers,Seller Delivered Orders,top seller,1772.0,1772.0,True
+Sellers,Seller Late %,top seller (2 dp),9.71,9.71,True
+Sellers,Seller Avg Review,top seller (2 dp),3.85,3.85,True
+Sellers,Seller Avg Delay (days),top seller (2 dp),-9.53,-9.53,True
+Sellers,Seller Revenue (R$),top seller,200326.12000000002,200326.12,True
+Sellers,Late Orders (seller sum) by decile,max abs diff vs seller_late_rate_by_decile.csv,0.0,0.0,True
+Sellers,Share of Seller Late Orders by decile,max abs diff vs seller_late_rate_by_decile.csv (2 dp),0.0,0.0,True
+Sellers,Excess Late Orders by decile,max abs diff vs seller_late_rate_by_decile.csv (2 dp),0.03999999999999204,0.0,False
