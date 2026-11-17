@@ -116,9 +116,91 @@ for artifact in pbip["artifacts"]:
     if not (powerbi / artifact["report"]["path"] / "definition.pbir").exists():
         problems.append(f"pbip artifact path missing: {artifact}")
 
+# ---- layout: overlapping visuals and clipped KPI cards / slicers
+# The clipping check is an estimate from font sizes (it cannot render the report): text height = points * 4/3 px
+# * 1.35 line spacing. It caught the Stage 4 problem (12 pt container title + 14/16 px theme padding on 86 px cards).
+LINE = 4 / 3 * 1.35                                   # px of height per point of font size
+SLICER_CONTROL_PX = {"Between": 48, "Dropdown": 32}   # date inputs + slider / one dropdown box
+
+
+def literal(properties, name, default=None):
+    """Value of a formatting property like {"expr": {"Literal": {"Value": "8D"}}} -> "8D"."""
+    try:
+        return properties[name]["expr"]["Literal"]["Value"]
+    except (KeyError, TypeError):
+        return default
+
+
+def number(value):
+    return float(str(value).rstrip("DL"))
+
+
+base_theme = json.loads((report / "StaticResources/SharedResources/BaseThemes/Fluent2-CY26SU10.json")
+                        .read_text(encoding="utf-8-sig"))
+
+
+def theme_padding(visual_type):
+    """Default container padding from the base theme: the visual type's own style (slicer = 0), else '*'."""
+    styles = base_theme["visualStyles"]
+    for paddings in (styles.get(visual_type, {}).get("*", {}).get("padding", []), styles["*"]["*"]["padding"]):
+        for padding in paddings:
+            if "top" in padding:
+                return padding
+    return {"top": 0, "bottom": 0}
+
+
+def container_box(visual):
+    """(padding top+bottom, title height in px) of a visual container, after its own overrides."""
+    objects = visual["visual"].get("visualContainerObjects", {})
+    pad = objects.get("padding", [{}])[0].get("properties", {})
+    defaults = theme_padding(visual["visual"]["visualType"])
+    vertical = sum(number(literal(pad, side, defaults[side])) for side in ("top", "bottom"))
+    title = objects.get("title", [{}])[0].get("properties", {})
+    title_shown = literal(title, "show", "true") == "true"   # the custom theme shows a title on every visual
+    title_px = number(literal(title, "fontSize", 12)) * LINE if title_shown else 0
+    return vertical, title_px
+
+
+overlaps = clipped = 0
+for page_dir in sorted((report / "definition/pages").iterdir()):
+    if not page_dir.is_dir():
+        continue
+    boxes = []
+    for visual_path in sorted(page_dir.glob("visuals/*/visual.json")):
+        visual = json.loads(visual_path.read_text(encoding="utf-8-sig"))
+        pos, kind = visual["position"], visual["visual"]["visualType"]
+        boxes.append((visual["name"], kind, pos["x"], pos["y"], pos["x"] + pos["width"], pos["y"] + pos["height"]))
+        vertical, title_px = container_box(visual)
+        objects = visual["visual"].get("objects", {})
+        if kind == "card":
+            value_pt = number(literal(objects.get("labels", [{}])[0].get("properties", {}), "fontSize", 24))
+            label = objects.get("categoryLabels", [{}])[0].get("properties", {})
+            label_pt = number(literal(label, "fontSize", 10)) if literal(label, "show", "true") == "true" else 0
+            needed = (value_pt + label_pt) * LINE
+        elif kind == "slicer":
+            mode = literal(objects.get("data", [{}])[0].get("properties", {}), "mode", "'Basic'").strip("'")
+            header_shown = literal(objects.get("header", [{}])[0].get("properties", {}), "show", "true") == "true"
+            needed = SLICER_CONTROL_PX.get(mode, 40) + (12 * LINE if header_shown else 0)
+        else:
+            continue
+        available = pos["height"] - vertical - title_px
+        if available < needed:
+            clipped += 1
+            problems.append(f"{visual_path.relative_to(powerbi)}: {kind} content likely clipped: needs ~{needed:.0f} px, "
+                            f"has {available:.0f} px (height {pos['height']} - padding {vertical:.0f} - title {title_px:.0f})")
+    for i, first in enumerate(boxes):
+        for second in boxes[i + 1:]:
+            if first[2] < second[4] and second[2] < first[4] and first[3] < second[5] and second[3] < first[5]:
+                overlaps += 1
+                problems.append(f"{page_dir.name}: {first[1]} {first[0]} overlaps {second[1]} {second[0]}")
+print(f"layout checked: {overlaps} overlapping pairs, {clipped} cards/slicers likely clipped")
+
 # ---- credentials must never be in project files
+# Skips Desktop's local-only files, which .gitignore keeps out of the repo: cache.abf (compressed imported data,
+# whose random bytes can spell "uid=") and localSettings.json.
+LOCAL_ONLY = {"cache.abf", "localSettings.json"}
 for path in [*report.rglob("*"), *model.parent.rglob("*"), powerbi / "Olist Retention.pbip"]:
-    if path.is_file() and re.search(r"(?i)password|pwd\s*=|uid\s*=", path.read_text(encoding="utf-8", errors="ignore")):
+    if path.is_file() and path.name not in LOCAL_ONLY and re.search(r"(?i)password|pwd\s*=|uid\s*=", path.read_text(encoding="utf-8", errors="ignore")):
         problems.append(f"possible credential text in {path.relative_to(powerbi)}")
 
 print("PROBLEMS:" if problems else "ALL CHECKS PASSED")

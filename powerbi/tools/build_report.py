@@ -61,11 +61,40 @@ def measure_color(measure_name):
 ALL_POINTS = {"data": [{"dataViewWildcard": {"matchingOption": 1}}]}
 
 
-def title_objects(title, subtitle=None):
-    objects = {"title": [{"properties": {"show": lit("true"), "text": text(title)}}]}
+def title_objects(title, subtitle=None, font_size=None):
+    properties = {"show": lit("true"), "text": text(title)}
+    if font_size:
+        properties["fontSize"] = lit(f"{font_size}D")
+    objects = {"title": [{"properties": properties}]}
     if subtitle:
         objects["subTitle"] = [{"properties": {"show": lit("true"), "text": text(subtitle)}}]
     return objects
+
+
+def padding_objects(vertical, horizontal):
+    return {"padding": [{"properties": {"top": lit(f"{vertical}D"), "bottom": lit(f"{vertical}D"),
+                                        "left": lit(f"{horizontal}D"), "right": lit(f"{horizontal}D")}}]}
+
+
+# ------------------------------------------------------------------ layout grid (page 1280 x 720 px)
+# Every page uses the same rows, so the report looks consistent. Gaps between rows are 8-14 px.
+# Cards and slicers turn their container title off / shrink padding: the Fluent2 base theme gives every visual
+# 14-16 px padding and the custom theme shows a 12 pt title on every visual, which clipped KPI values and slicers.
+PAGE_WIDTH, PAGE_HEIGHT = 1280, 720
+MARGIN, GAP = 16, 12                        # outer page margin, gap between visuals in a row
+CONTENT_WIDTH = PAGE_WIDTH - 2 * MARGIN     # 1248
+HEADER_Y, HEADER_HEIGHT = 8, 56             # page title + subtitle text box (y 8-64)
+NAV_Y, NAV_HEIGHT = 16, 40                  # page navigator / back button, vertically centred on the header
+SLICER_Y, SLICER_HEIGHT, SLICER_WIDTH = 72, 76, 300        # slicer row (y 72-148)
+SLICER_STEP = SLICER_WIDTH + GAP            # slicer slot n starts at x = 16 + n * 312
+SLICER_TITLE_PT = 10
+CARD_Y, CARD_HEIGHT = 162, 92               # KPI card row (y 162-254)
+CARD_PADDING = (8, 12)                      # (top/bottom, left/right) px
+ROW2, ROW3 = 266, 493                       # first and second chart rows
+HALF, FULL = 215, 442                       # one-row chart height; two-row chart height (ROW3 + HALF - ROW2)
+DETAIL_CARD_Y = 76                          # Seller Detail has no slicers: cards sit right under the header
+DETAIL_CHART_Y = DETAIL_CARD_Y + CARD_HEIGHT + GAP           # 180
+DETAIL_CHART_HEIGHT = ROW3 + HALF - DETAIL_CHART_Y           # 528: ends at y 708 like the other pages' charts
 
 
 def in_filter(name, field, values):
@@ -112,25 +141,35 @@ class Page:
         paragraphs = [{"textRuns": [{"value": self.display_name,
                                      "textStyle": {"fontWeight": "bold", "fontSize": "18pt", "color": INK}}]},
                       {"textRuns": [{"value": self.subtitle, "textStyle": {"fontSize": "10pt", "color": MUTED}}]}]
-        self.add("header", "textbox", 16, 6, 600, 56, objects={"general": [{"properties": {"paragraphs": paragraphs}}]},
+        self.add("header", "textbox", MARGIN, HEADER_Y, 600, HEADER_HEIGHT,
+                 objects={"general": [{"properties": {"paragraphs": paragraphs}}]},
                  container={"background": [{"properties": {"show": lit("false")}}],
                             "border": [{"properties": {"show": lit("false")}}]})
         if navigator:
-            self.add("nav", "pageNavigator", 628, 14, 636, 40)
+            self.add("nav", "pageNavigator", 628, NAV_Y, PAGE_WIDTH - MARGIN - 628, NAV_HEIGHT)
 
-    def slicer(self, key, field, x, w, mode, sync=None, title=None):
-        self.add(key, "slicer", x, 66, w, 52, roles={"Values": [field]},
-                 objects={"data": [{"properties": {"mode": text(mode)}}]},
-                 container=title_objects(title) if title else None, sync=sync)
+    def slicer(self, key, field, slot, mode, sync=None, title=None):
+        """Slicer in slot 0, 1, 2... of the slicer row. The default slicer header is hidden (the container title
+        names the slicer instead), which leaves room for the date range inputs and the slider."""
+        self.add(key, "slicer", MARGIN + slot * SLICER_STEP, SLICER_Y, SLICER_WIDTH, SLICER_HEIGHT,
+                 roles={"Values": [field]},
+                 objects={"data": [{"properties": {"mode": text(mode)}}],
+                          "header": [{"properties": {"show": lit("false")}}]},
+                 container=title_objects(title, font_size=SLICER_TITLE_PT) if title else None, sync=sync)
 
-    def cards(self, measures, filters_for=None):
-        width = (1248 - 12 * (len(measures) - 1)) / len(measures)
+    def cards(self, measures, y=CARD_Y, filters_for=None):
+        """One row of KPI cards across the page. The card's own category label names the measure, so the
+        container title is turned off and the padding reduced: this stops the value being clipped."""
+        width, remainder = divmod(CONTENT_WIDTH - GAP * (len(measures) - 1), len(measures))
+        assert remainder == 0, f"{len(measures)} cards do not fit the {CONTENT_WIDTH} px row in whole pixels"
+        container = {"title": [{"properties": {"show": lit("false")}}], **padding_objects(*CARD_PADDING)}
         for index, measure in enumerate(measures):
-            self.add(f"card{index}", "card", 16 + index * (width + 12), 128, width, 86, roles={"Values": [meas(measure)]},
+            self.add(f"card{index}", "card", MARGIN + index * (width + GAP), y, width, CARD_HEIGHT,
+                     roles={"Values": [meas(measure)]},
                      objects={"labels": [{"properties": {"color": color(BLUE), "fontSize": lit("22D")}}],
                               "categoryLabels": [{"properties": {"show": lit("true"), "color": color(MUTED),
                                                                  "fontSize": lit("10D")}}]},
-                     filters=(filters_for or {}).get(measure))
+                     container=container, filters=(filters_for or {}).get(measure))
 
     def bar_colors(self, measure_name):
         return {"dataPoint": [{"properties": {"fill": measure_color(measure_name)}, "selector": ALL_POINTS}]}
@@ -143,8 +182,6 @@ MONTH = col("dim_date", "year_month_label")
 CUST_STATE = col("dim_customer", "customer_state")
 CATEGORY = col("dim_product", "category_english")
 DECILE = col("dim_seller", "late_rate_decile")
-ROW1, ROW2, ROW3 = 128, 226, 472           # cards, first chart row, second chart row
-H2, H3, FULL = 234, 236, 482
 
 
 def build_pages():
@@ -153,10 +190,10 @@ def build_pages():
     # ---------------------------------------------------------------- 1. Executive Overview
     p = Page("executive", "Executive Overview", "Olist marketplace, Brazil | valid orders 2017-01 to 2018-08 | R$ (BRL)")
     p.header()
-    p.slicer("date", DATE, 16, 320, "Between", sync="PurchaseDate", title="Purchase date")
-    p.slicer("state", CUST_STATE, 348, 200, "Dropdown", sync="CustomerState", title="Customer state")
+    p.slicer("date", DATE, 0, "Between", sync="PurchaseDate", title="Purchase date")
+    p.slicer("state", CUST_STATE, 1, "Dropdown", sync="CustomerState", title="Customer state")
     p.cards(["Total Revenue (R$)", "Orders", "Customers", "AOV (R$)", "Repeat Customer %"])
-    p.add("revenue_month", "clusteredColumnChart", 16, ROW2, 816, H2,
+    p.add("revenue_month", "clusteredColumnChart", 16, ROW2, 816, HALF,
           roles={"Category": [MONTH], "Y": [meas("Total Revenue (R$)")], "Tooltips": [meas("Revenue MoM %"), meas("Orders")]},
           sort=[(MONTH, "Ascending")],
           container=title_objects("Monthly revenue trend", "Black Friday: Nov 2017 revenue +52.06% vs Oct 2017"))
@@ -165,7 +202,7 @@ def build_pages():
                  "Tooltips": [meas("State Revenue Share %"), meas("State Cumulative Revenue %")]},
           sort=[(meas("Total Revenue (R$)"), "Descending")], objects=LABELS_ON,
           container=title_objects("Revenue by customer state", "SP alone brings 38.30% of revenue"))
-    p.add("revenue_category", "clusteredBarChart", 16, ROW3, 816, H3,
+    p.add("revenue_category", "clusteredBarChart", 16, ROW3, 816, HALF,
           roles={"Category": [CATEGORY], "Y": [meas("Item Revenue (R$)")],
                  "Tooltips": [meas("Category Revenue Share %"), meas("Category Cumulative Revenue %")]},
           sort=[(meas("Item Revenue (R$)"), "Descending")], objects=LABELS_ON,
@@ -175,8 +212,8 @@ def build_pages():
     # ---------------------------------------------------------------- 2. Customer Retention
     p = Page("retention", "Customer Retention", "Repeat purchase is rare: people counted by customer_unique_id")
     p.header()
-    p.slicer("date", DATE, 16, 320, "Between", sync="PurchaseDate", title="Purchase date")
-    p.slicer("state", CUST_STATE, 348, 200, "Dropdown", sync="CustomerState", title="Customer state")
+    p.slicer("date", DATE, 0, "Between", sync="PurchaseDate", title="Purchase date")
+    p.slicer("state", CUST_STATE, 1, "Dropdown", sync="CustomerState", title="Customer state")
     p.cards(["Customers", "Repeat Customers", "One-time Customers", "Repeat Customer %", "Orders per Customer"])
     offset = col("Cohort Month Offset", "month_offset")
     p.add("cohort", "pivotTable", 16, ROW2, 816, FULL,
@@ -193,13 +230,13 @@ def build_pages():
           filters=[in_filter("cohortMonths1to12", offset, [f"{n}L" for n in range(1, 13)])],
           container=title_objects("Cohort retention: % of each cohort buying again",
                                   "Months 1-12 after the first order. Cohorts use the whole window; the date slicer does not apply."))
-    p.add("customer_type", "clusteredBarChart", 844, ROW2, 420, H2,
+    p.add("customer_type", "clusteredBarChart", 844, ROW2, 420, HALF,
           roles={"Category": [col("dim_customer", "Customer Type")], "Y": [meas("Customers")],
                  "Tooltips": [meas("Orders per Customer")]}, objects=LABELS_ON,
           sort=[(meas("Customers"), "Descending")],
           container=title_objects("Customer segmentation", "Repeat = 2+ valid orders over the whole window"))
     band = col("dim_customer", "Order Count Band")
-    p.add("orders_band", "clusteredColumnChart", 844, ROW3, 420, H3,
+    p.add("orders_band", "clusteredColumnChart", 844, ROW3, 420, HALF,
           roles={"Category": [band], "Y": [meas("Customers")]}, objects=LABELS_ON, sort=[(band, "Ascending")],
           container=title_objects("Orders per customer", "Valid orders per person, whole window"))
     pages.append(p)
@@ -207,25 +244,25 @@ def build_pages():
     # ---------------------------------------------------------------- 3. Delivery Performance
     p = Page("delivery", "Delivery Performance", "Delivered orders in scope; late = delivered after the estimated date")
     p.header()
-    p.slicer("date", DATE, 16, 320, "Between", sync="PurchaseDate", title="Purchase date")
-    p.slicer("state", CUST_STATE, 348, 200, "Dropdown", sync="CustomerState", title="Customer state")
+    p.slicer("date", DATE, 0, "Between", sync="PurchaseDate", title="Purchase date")
+    p.slicer("state", CUST_STATE, 1, "Dropdown", sync="CustomerState", title="Customer state")
     p.cards(["Delivered Orders", "On-Time %", "Late %", "Avg Delivery Days", "Avg Delay (days)"])
-    p.add("ontime_month", "lineChart", 16, ROW2, 616, H2,
+    p.add("ontime_month", "lineChart", 16, ROW2, 616, HALF,
           roles={"Category": [MONTH], "Y": [meas("On-Time %")],
                  "Tooltips": [meas("Late %"), meas("Delivered Orders"), meas("Avg Delivery Days")]},
           sort=[(MONTH, "Ascending")], objects={"lineStyles": [{"properties": {"showMarker": lit("true")}}]},
           container=title_objects("Delivery performance by purchase month", "On-time % dipped to 81% in March 2018"))
     bucket = col("fact_orders", "delay_bucket")
-    p.add("buckets", "clusteredColumnChart", 644, ROW2, 620, H2,
+    p.add("buckets", "clusteredColumnChart", 644, ROW2, 620, HALF,
           roles={"Category": [bucket], "Y": [meas("Delivered Orders")], "Tooltips": [meas("Avg Review (delivered)")]},
           sort=[(bucket, "Ascending")], objects={**p.bar_colors("Colour - Late Bucket"), **LABELS_ON},
           container=title_objects("Delay bucket analysis", "Delivered date vs estimated date; orange = late"))
-    p.add("late_state", "clusteredBarChart", 16, ROW3, 616, H3,
+    p.add("late_state", "clusteredBarChart", 16, ROW3, 616, HALF,
           roles={"Category": [CUST_STATE], "Y": [meas("Late %")],
                  "Tooltips": [meas("Late % vs Platform (pp)"), meas("Delivered Orders"), meas("Platform Late Rate")]},
           sort=[(meas("Late %"), "Descending")], objects={**p.bar_colors("Colour - Late vs Platform"), **LABELS_ON},
           container=title_objects("Late % by customer state", "Orange = above the platform late rate (6.79%)"))
-    p.add("review_delay", "clusteredColumnChart", 644, ROW3, 620, H3,
+    p.add("review_delay", "clusteredColumnChart", 644, ROW3, 620, HALF,
           roles={"Category": [bucket], "Y": [meas("Avg Review (delivered)")], "Tooltips": [meas("Delivered Orders")]},
           sort=[(bucket, "Ascending")], objects={**p.bar_colors("Colour - Late Bucket"), **LABELS_ON},
           container=title_objects("Review score vs delivery delay", "7+ days late: 1.70 stars vs 4.29 when early"))
@@ -234,9 +271,9 @@ def build_pages():
     # ---------------------------------------------------------------- 4. Seller Performance
     p = Page("sellers", "Seller Performance", "Ranked sellers = 30+ delivered orders; rates use seller-order pairs")
     p.header()
-    p.slicer("date", DATE, 16, 320, "Between", sync="PurchaseDate", title="Purchase date")
-    p.slicer("seller_state", col("dim_seller", "seller_state"), 348, 200, "Dropdown", title="Seller state")
-    p.slicer("decile", DECILE, 560, 200, "Dropdown", title="Late-rate decile (1 = worst)")
+    p.slicer("date", DATE, 0, "Between", sync="PurchaseDate", title="Purchase date")
+    p.slicer("seller_state", col("dim_seller", "seller_state"), 1, "Dropdown", title="Seller state")
+    p.slicer("decile", DECILE, 2, "Dropdown", title="Late-rate decile (1 = worst)")
     p.cards(["Total Sellers", "Ranked Sellers", "Seller Late % (pairs)", "Delivered Orders (seller sum)", "Excess Late Orders"],
             filters_for={m: RANKED(f"rankedCard{i}") for i, m in enumerate(
                 ["Seller Late % (pairs)", "Delivered Orders (seller sum)", "Excess Late Orders"])})
@@ -251,12 +288,12 @@ def build_pages():
                                "selector": {"metadata": f"{M}.Seller Late %"}}]},
           container=title_objects("Seller ranking: worst performing sellers first",
                                   "Sorted by excess late orders. Right-click a seller > Drill through > Seller Detail"))
-    p.add("decile_rate", "clusteredColumnChart", 788, ROW2, 476, H2,
+    p.add("decile_rate", "clusteredColumnChart", 788, ROW2, 476, HALF,
           roles={"Category": [DECILE], "Y": [meas("Seller Late % (pairs)")], "Tooltips": [meas("Ranked Sellers")]},
           sort=[(DECILE, "Ascending")], filters=RANKED("rankedDecileRate"),
           objects={**p.bar_colors("Colour - Seller Late (pairs) vs Platform"), **LABELS_ON},
           container=title_objects("Seller late rate by decile", "Orange = above the platform late rate"))
-    p.add("decile_excess", "clusteredColumnChart", 788, ROW3, 476, H3,
+    p.add("decile_excess", "clusteredColumnChart", 788, ROW3, 476, HALF,
           roles={"Category": [DECILE], "Y": [meas("Excess Late Orders")],
                  "Tooltips": [meas("Share of Seller Late Orders"), meas("Late Orders (seller sum)")]},
           sort=[(DECILE, "Ascending")], filters=RANKED("rankedDecileExcess"), objects=LABELS_ON,
@@ -266,26 +303,26 @@ def build_pages():
     # ---------------------------------------------------------------- 5. Product & Revenue
     p = Page("revenue", "Product & Revenue Analysis", "Category revenue = item prices; state revenue = order revenue")
     p.header()
-    p.slicer("date", DATE, 16, 320, "Between", sync="PurchaseDate", title="Purchase date")
-    p.slicer("state", CUST_STATE, 348, 200, "Dropdown", sync="CustomerState", title="Customer state")
+    p.slicer("date", DATE, 0, "Between", sync="PurchaseDate", title="Purchase date")
+    p.slicer("state", CUST_STATE, 1, "Dropdown", sync="CustomerState", title="Customer state")
     p.cards(["Total Revenue (R$)", "Orders", "AOV (R$)", "Categories for 80% Revenue", "States for 80% Revenue"])
-    p.add("growth", "lineClusteredColumnComboChart", 16, ROW2, 408, H2,
+    p.add("growth", "lineClusteredColumnComboChart", 16, ROW2, 408, HALF,
           roles={"Category": [MONTH], "Y": [meas("Total Revenue (R$)")], "Y2": [meas("Revenue MoM %")],
                  "Tooltips": [meas("Revenue Change vs Previous Month (R$)")]},
           sort=[(MONTH, "Ascending")], container=title_objects("Monthly revenue growth", "Columns = revenue, line = MoM %"))
-    p.add("aov", "lineChart", 436, ROW2, 408, H2,
+    p.add("aov", "lineChart", 436, ROW2, 408, HALF,
           roles={"Category": [MONTH], "Y": [meas("AOV (R$)")], "Tooltips": [meas("Orders")]},
           sort=[(MONTH, "Ascending")], objects={"lineStyles": [{"properties": {"showMarker": lit("true")}}]},
           container=title_objects("AOV trend", "Average order value by purchase month"))
-    p.add("state_pareto", "lineClusteredColumnComboChart", 856, ROW2, 408, H2,
+    p.add("state_pareto", "lineClusteredColumnComboChart", 856, ROW2, 408, HALF,
           roles={"Category": [CUST_STATE], "Y": [meas("Total Revenue (R$)")], "Y2": [meas("State Cumulative Revenue %")]},
           sort=[(meas("Total Revenue (R$)"), "Descending")],
           container=title_objects("Revenue by state (Pareto)", "7 of 27 states make 80% of revenue"))
-    p.add("category_pareto", "lineClusteredColumnComboChart", 16, ROW3, 616, H3,
+    p.add("category_pareto", "lineClusteredColumnComboChart", 16, ROW3, 616, HALF,
           roles={"Category": [CATEGORY], "Y": [meas("Item Revenue (R$)")], "Y2": [meas("Category Cumulative Revenue %")]},
           sort=[(meas("Item Revenue (R$)"), "Descending")],
           container=title_objects("Pareto 80/20: revenue by category", "18 of 74 categories make 80% of revenue"))
-    p.add("top_categories", "tableEx", 644, ROW3, 620, H3,
+    p.add("top_categories", "tableEx", 644, ROW3, 620, HALF,
           roles={"Values": [(meas("Category Revenue Rank"), "Rank"), (CATEGORY, "Category"),
                             (meas("Item Revenue (R$)"), "Revenue (R$)"), (meas("Category Revenue Share %"), "Share"),
                             (meas("Category Cumulative Revenue %"), "Cumulative"), (meas("Item Orders"), "Orders")]},
@@ -295,20 +332,26 @@ def build_pages():
 
     # ---------------------------------------------------------------- 6. Seller Detail (hidden drill-through)
     p = Page("seller_detail", "Seller Detail", "Drill-through from Seller Performance")
-    p.add("back", "actionButton", 16, 14, 44, 40,
+    p.add("back", "actionButton", MARGIN, NAV_Y, 44, NAV_HEIGHT,
           objects={"icon": [{"properties": {"shapeType": text("back")}}]},
           container={"visualLink": [{"properties": {"show": lit("true"), "type": text("Back")}}]})
-    p.add("detail_title", "card", 72, 8, 1192, 56, roles={"Values": [meas("Seller Detail Title")]},
+    # Page heading = a card showing the selected seller (a text box cannot show a measure). It sits right of the back
+    # button, centred on the same line (y 36). Container title off: it would only repeat the measure name and,
+    # with the theme padding, leave ~4 px for the 16 pt heading.
+    title_x = MARGIN + 44 + GAP
+    p.add("detail_title", "card", title_x, HEADER_Y, PAGE_WIDTH - MARGIN - title_x, HEADER_HEIGHT,
+          roles={"Values": [meas("Seller Detail Title")]},
           objects={"labels": [{"properties": {"color": color(INK), "fontSize": lit("16D")}}],
-                   "categoryLabels": [{"properties": {"show": lit("false")}}]})
+                   "categoryLabels": [{"properties": {"show": lit("false")}}]},
+          container={"title": [{"properties": {"show": lit("false")}}], **padding_objects(*CARD_PADDING)})
     p.cards(["Seller Delivered Orders", "Seller Late %", "Seller Avg Delay (days)", "Seller Avg Review",
-             "Seller Revenue (R$)", "Excess Late Orders"])
-    p.add("detail_month", "lineChart", 16, ROW2, 616, FULL,
+             "Seller Revenue (R$)", "Excess Late Orders"], y=DETAIL_CARD_Y)
+    p.add("detail_month", "lineChart", 16, DETAIL_CHART_Y, 616, DETAIL_CHART_HEIGHT,
           roles={"Category": [MONTH], "Y": [meas("Seller Late %")],
                  "Tooltips": [meas("Platform Late Rate"), meas("Seller Delivered Orders")]},
           sort=[(MONTH, "Ascending")], objects={"lineStyles": [{"properties": {"showMarker": lit("true")}}]},
           container=title_objects("Late % by month", "Compare with the platform late rate (tooltip)"))
-    p.add("detail_categories", "clusteredBarChart", 644, ROW2, 620, FULL,
+    p.add("detail_categories", "clusteredBarChart", 644, DETAIL_CHART_Y, 620, DETAIL_CHART_HEIGHT,
           roles={"Category": [CATEGORY], "Y": [meas("Seller Delivered Orders")], "Tooltips": [meas("Seller Revenue (R$)")]},
           sort=[(meas("Seller Delivered Orders"), "Descending")], objects=LABELS_ON,
           container=title_objects("What this seller ships", "Delivered orders by category"))

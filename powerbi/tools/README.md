@@ -8,7 +8,11 @@ truth: re-running the generators overwrites those edits.**
 | `build_model.py <powerbi_dir>` | Writes `Olist Retention.SemanticModel/` (TMDL): 6 MySQL views, 7 relationships, 54 measures from `dax_measures.md`. No credentials. |
 | `build_report.py <powerbi_dir> <base_theme.json>` | Writes `Olist Retention.Report/` (PBIR): 5 pages + hidden Seller Detail drill-through, theme, and the `.pbip` file. The base theme JSON comes from the Desktop install (`bin\WebView2Resources\minerva\sharedresources\BaseThemes\Fluent2-CY26SU10.json`). |
 | `validate_tmdl.ps1 -DefinitionFolder <...SemanticModel\definition>` | Parses the model with Power BI Desktop's own `TmdlSerializer` and prints tables, relationships, sort-by columns and measure folders. |
-| `validate_report.py <powerbi_dir> <schema_root>` | Validates every report JSON file against the PBIR JSON schemas shipped inside Power BI Desktop 2.159 (extracted from `Microsoft.PowerBI.ClientResources.dll`), checks every field reference exists in the model, page/visual/resource paths, drill-through binding, and that no credential text is present. |
+| `validate_report.py <powerbi_dir> <schema_root>` | Validates every report JSON file against the PBIR JSON schemas shipped inside Power BI Desktop 2.159 (extracted from `Microsoft.PowerBI.ClientResources.dll`), checks every field reference exists in the model, page/visual/resource paths, drill-through binding, and that no credential text is present. Layout checks: visuals overlapping on a page, and KPI cards / slicers whose height (minus padding and title) is likely too small for their text (an estimate from font sizes, not a render). |
+
+`build_report.py` places visuals on one layout grid (constants near the top): header y 8, slicer row y 72 (300 x 76,
+header off, 10 pt title), KPI cards y 162 (92 high, title off, padding 8/12), chart rows y 266 and y 493 (215 high,
+442 for two rows). Seller Detail has no slicers: cards at y 76, charts y 180-708.
 
 Not checked by these tools: DAX syntax and results (Power BI Desktop evaluates DAX after refresh; see Stage 5) and the
 exact look of each visual.
