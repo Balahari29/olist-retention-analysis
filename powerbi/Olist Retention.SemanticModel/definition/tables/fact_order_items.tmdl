@@ -39,8 +39,8 @@ table fact_order_items
 
 	column purchase_date
 		dataType: dateTime
-		formatString: yyyy-mm-dd
 		isHidden
+		formatString: yyyy-mm-dd
 		lineageTag: 86c0f1b6-3003-5b2d-b95e-77e34120e11a
 		summarizeBy: none
 		sourceColumn: purchase_date
@@ -49,8 +49,8 @@ table fact_order_items
 
 	column price
 		dataType: decimal
-		formatString: R$ #,0.00
 		isHidden
+		formatString: R$ #,0.00
 		lineageTag: 9323627d-5ed6-51f2-bfc1-718357e0a709
 		summarizeBy: none
 		sourceColumn: price
@@ -108,3 +108,4 @@ table fact_order_items
 				    Typed
 
 	annotation PBI_ResultType = Table
+

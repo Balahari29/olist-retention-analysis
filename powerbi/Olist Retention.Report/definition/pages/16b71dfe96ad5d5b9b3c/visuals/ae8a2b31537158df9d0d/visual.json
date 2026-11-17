@@ -3,9 +3,9 @@
   "name": "ae8a2b31537158df9d0d",
   "position": {
     "x": 844,
-    "y": 226,
+    "y": 266,
     "z": 11000,
-    "height": 234,
+    "height": 215,
     "width": 420,
     "tabOrder": 11000
   },
@@ -27,25 +27,8 @@
                 }
               },
               "queryRef": "dim_customer.Customer Type",
-              "nativeQueryRef": "Customer Type"
-            }
-          ]
-        },
-        "Y": {
-          "projections": [
-            {
-              "field": {
-                "Measure": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "_Measures"
-                    }
-                  },
-                  "Property": "Customers"
-                }
-              },
-              "queryRef": "_Measures.Customers",
-              "nativeQueryRef": "Customers"
+              "nativeQueryRef": "Customer Type",
+              "active": true
             }
           ]
         },
@@ -66,6 +49,24 @@
               "nativeQueryRef": "Orders per Customer"
             }
           ]
+        },
+        "Y": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "Customers"
+                }
+              },
+              "queryRef": "_Measures.Customers",
+              "nativeQueryRef": "Customers"
+            }
+          ]
         }
       },
       "sortDefinition": {
@@ -83,8 +84,7 @@
             },
             "direction": "Descending"
           }
-        ],
-        "isDefaultSort": false
+        ]
       }
     },
     "objects": {

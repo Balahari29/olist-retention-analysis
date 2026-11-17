@@ -3,9 +3,9 @@
   "name": "3bc8faf4ebe952dfabef",
   "position": {
     "x": 844,
-    "y": 226,
+    "y": 266,
     "z": 11000,
-    "height": 482,
+    "height": 442,
     "width": 420,
     "tabOrder": 11000
   },
@@ -27,25 +27,8 @@
                 }
               },
               "queryRef": "dim_customer.customer_state",
-              "nativeQueryRef": "customer_state"
-            }
-          ]
-        },
-        "Y": {
-          "projections": [
-            {
-              "field": {
-                "Measure": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "_Measures"
-                    }
-                  },
-                  "Property": "Total Revenue (R$)"
-                }
-              },
-              "queryRef": "_Measures.Total Revenue (R$)",
-              "nativeQueryRef": "Total Revenue (R$)"
+              "nativeQueryRef": "customer_state",
+              "active": true
             }
           ]
         },
@@ -80,6 +63,24 @@
               "nativeQueryRef": "State Cumulative Revenue %"
             }
           ]
+        },
+        "Y": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "Total Revenue (R$)"
+                }
+              },
+              "queryRef": "_Measures.Total Revenue (R$)",
+              "nativeQueryRef": "Total Revenue (R$)"
+            }
+          ]
         }
       },
       "sortDefinition": {
@@ -97,8 +98,7 @@
             },
             "direction": "Descending"
           }
-        ],
-        "isDefaultSort": false
+        ]
       }
     },
     "objects": {

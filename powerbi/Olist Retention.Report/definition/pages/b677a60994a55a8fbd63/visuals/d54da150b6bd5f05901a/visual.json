@@ -3,9 +3,9 @@
   "name": "d54da150b6bd5f05901a",
   "position": {
     "x": 436,
-    "y": 226,
+    "y": 266,
     "z": 11000,
-    "height": 234,
+    "height": 215,
     "width": 408,
     "tabOrder": 11000
   },
@@ -27,25 +27,8 @@
                 }
               },
               "queryRef": "dim_date.year_month_label",
-              "nativeQueryRef": "year_month_label"
-            }
-          ]
-        },
-        "Y": {
-          "projections": [
-            {
-              "field": {
-                "Measure": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "_Measures"
-                    }
-                  },
-                  "Property": "AOV (R$)"
-                }
-              },
-              "queryRef": "_Measures.AOV (R$)",
-              "nativeQueryRef": "AOV (R$)"
+              "nativeQueryRef": "year_month_label",
+              "active": true
             }
           ]
         },
@@ -66,6 +49,24 @@
               "nativeQueryRef": "Orders"
             }
           ]
+        },
+        "Y": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "AOV (R$)"
+                }
+              },
+              "queryRef": "_Measures.AOV (R$)",
+              "nativeQueryRef": "AOV (R$)"
+            }
+          ]
         }
       },
       "sortDefinition": {
@@ -83,8 +84,7 @@
             },
             "direction": "Ascending"
           }
-        ],
-        "isDefaultSort": false
+        ]
       }
     },
     "objects": {

@@ -22,22 +22,22 @@ table dim_seller
 
 	column seller_state
 		dataType: string
-		dataCategory: StateOrProvince
 		lineageTag: f28d335f-cf6c-5657-910b-b82dbc1469f2
+		dataCategory: StateOrProvince
 		summarizeBy: none
 		sourceColumn: seller_state
 
 	column seller_latitude
 		dataType: double
-		dataCategory: Latitude
 		lineageTag: af7a952e-579f-5204-9d24-4a3c8a16a750
+		dataCategory: Latitude
 		summarizeBy: none
 		sourceColumn: seller_latitude
 
 	column seller_longitude
 		dataType: double
-		dataCategory: Longitude
 		lineageTag: b9c8c74f-e5ad-5154-9373-fd2bbc67a0fe
+		dataCategory: Longitude
 		summarizeBy: none
 		sourceColumn: seller_longitude
 
@@ -70,3 +70,4 @@ table dim_seller
 				    Typed
 
 	annotation PBI_ResultType = Table
+

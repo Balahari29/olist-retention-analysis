@@ -26,3 +26,4 @@ relationship c7701be2-c572-5abc-be96-a84bbebd69b0
 relationship a1bbe543-7878-5de6-b88d-8ed493021259
 	fromColumn: fact_order_items.customer_id
 	toColumn: dim_customer.customer_id
+

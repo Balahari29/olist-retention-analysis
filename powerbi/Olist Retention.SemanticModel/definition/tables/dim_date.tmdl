@@ -1,12 +1,12 @@
 /// Calendar, one row per day 2017-01-01 to 2018-12-31 (MySQL view dim_date). Marked as date table.
 table dim_date
-	dataCategory: Time
 	lineageTag: 09d267c2-550d-5e30-b979-3b7062d49a11
+	dataCategory: Time
 
 	column date_key
 		dataType: dateTime
-		formatString: yyyy-mm-dd
 		isKey
+		formatString: yyyy-mm-dd
 		lineageTag: ff854489-f102-5895-94b3-889fa7ba9805
 		summarizeBy: none
 		sourceColumn: date_key
@@ -84,3 +84,4 @@ table dim_date
 				    Typed
 
 	annotation PBI_ResultType = Table
+

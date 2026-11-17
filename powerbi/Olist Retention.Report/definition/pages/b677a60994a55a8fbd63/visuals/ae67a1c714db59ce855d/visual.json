@@ -3,9 +3,9 @@
   "name": "ae67a1c714db59ce855d",
   "position": {
     "x": 16,
-    "y": 226,
+    "y": 266,
     "z": 10000,
-    "height": 234,
+    "height": 215,
     "width": 408,
     "tabOrder": 10000
   },
@@ -27,7 +27,26 @@
                 }
               },
               "queryRef": "dim_date.year_month_label",
-              "nativeQueryRef": "year_month_label"
+              "nativeQueryRef": "year_month_label",
+              "active": true
+            }
+          ]
+        },
+        "Tooltips": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "Revenue Change vs Previous Month (R$)"
+                }
+              },
+              "queryRef": "_Measures.Revenue Change vs Previous Month (R$)",
+              "nativeQueryRef": "Revenue Change vs Previous Month (R$)"
             }
           ]
         },
@@ -66,24 +85,6 @@
               "nativeQueryRef": "Revenue MoM %"
             }
           ]
-        },
-        "Tooltips": {
-          "projections": [
-            {
-              "field": {
-                "Measure": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "_Measures"
-                    }
-                  },
-                  "Property": "Revenue Change vs Previous Month (R$)"
-                }
-              },
-              "queryRef": "_Measures.Revenue Change vs Previous Month (R$)",
-              "nativeQueryRef": "Revenue Change vs Previous Month (R$)"
-            }
-          ]
         }
       },
       "sortDefinition": {
@@ -101,8 +102,7 @@
             },
             "direction": "Ascending"
           }
-        ],
-        "isDefaultSort": false
+        ]
       }
     },
     "visualContainerObjects": {

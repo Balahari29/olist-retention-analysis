@@ -3,10 +3,10 @@
   "name": "0c028ab2eebb5bcb9027",
   "position": {
     "x": 16,
-    "y": 66,
+    "y": 72,
     "z": 3000,
-    "height": 52,
-    "width": 320,
+    "height": 76,
+    "width": 300,
     "tabOrder": 3000
   },
   "visual": {
@@ -27,7 +27,8 @@
                 }
               },
               "queryRef": "dim_date.date_key",
-              "nativeQueryRef": "date_key"
+              "nativeQueryRef": "date_key",
+              "active": true
             }
           ]
         }
@@ -41,6 +42,19 @@
               "expr": {
                 "Literal": {
                   "Value": "'Between'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "header": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
                 }
               }
             }
@@ -63,6 +77,13 @@
               "expr": {
                 "Literal": {
                   "Value": "'Purchase date'"
+                }
+              }
+            },
+            "fontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "10D"
                 }
               }
             }

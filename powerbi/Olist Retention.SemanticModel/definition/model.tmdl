@@ -11,6 +11,8 @@ annotation __PBI_TimeIntelligenceEnabled = 0
 
 annotation PBI_QueryOrder = ["MySQL Server","MySQL Database","dim_date","dim_customer","dim_seller","dim_product","fact_orders","fact_order_items"]
 
+annotation PBI_ProTooling = ["DevMode"]
+
 ref table dim_date
 ref table dim_customer
 ref table dim_seller
@@ -19,3 +21,6 @@ ref table fact_orders
 ref table fact_order_items
 ref table _Measures
 ref table 'Cohort Month Offset'
+
+ref cultureInfo en-US
+

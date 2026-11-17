@@ -3,9 +3,9 @@
   "name": "bbd2b7f371965714a88b",
   "position": {
     "x": 16,
-    "y": 472,
+    "y": 493,
     "z": 12000,
-    "height": 236,
+    "height": 215,
     "width": 816,
     "tabOrder": 12000
   },
@@ -27,25 +27,8 @@
                 }
               },
               "queryRef": "dim_product.category_english",
-              "nativeQueryRef": "category_english"
-            }
-          ]
-        },
-        "Y": {
-          "projections": [
-            {
-              "field": {
-                "Measure": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "_Measures"
-                    }
-                  },
-                  "Property": "Item Revenue (R$)"
-                }
-              },
-              "queryRef": "_Measures.Item Revenue (R$)",
-              "nativeQueryRef": "Item Revenue (R$)"
+              "nativeQueryRef": "category_english",
+              "active": true
             }
           ]
         },
@@ -80,6 +63,24 @@
               "nativeQueryRef": "Category Cumulative Revenue %"
             }
           ]
+        },
+        "Y": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "Item Revenue (R$)"
+                }
+              },
+              "queryRef": "_Measures.Item Revenue (R$)",
+              "nativeQueryRef": "Item Revenue (R$)"
+            }
+          ]
         }
       },
       "sortDefinition": {
@@ -97,8 +98,7 @@
             },
             "direction": "Descending"
           }
-        ],
-        "isDefaultSort": false
+        ]
       }
     },
     "objects": {

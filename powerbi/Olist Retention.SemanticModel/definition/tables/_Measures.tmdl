@@ -412,9 +412,9 @@ table _Measures
 	column Value
 		dataType: int64
 		isHidden
-		isNameInferred
 		lineageTag: e855b42a-b0f0-55fd-b076-f3d003bbe4b6
 		summarizeBy: none
+		isNameInferred
 		sourceColumn: [Value]
 
 	partition _Measures = calculated
@@ -422,3 +422,4 @@ table _Measures
 		source = { 0 }
 
 	annotation PBI_Id = measures-table
+

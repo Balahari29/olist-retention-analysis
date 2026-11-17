@@ -9,3 +9,4 @@ expression 'MySQL Database' = "olist" meta [IsParameterQuery = true, Type = "Tex
 	lineageTag: e33a9aca-2eb7-5a26-9999-cfaa26e04e85
 
 	annotation PBI_ResultType = Text
+

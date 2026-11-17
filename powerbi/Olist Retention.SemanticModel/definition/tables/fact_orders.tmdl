@@ -17,8 +17,8 @@ table fact_orders
 
 	column purchase_date
 		dataType: dateTime
-		formatString: yyyy-mm-dd
 		isHidden
+		formatString: yyyy-mm-dd
 		lineageTag: 9095660a-4b76-5496-ac22-4c07401bdfdc
 		summarizeBy: none
 		sourceColumn: purchase_date
@@ -161,3 +161,4 @@ table fact_orders
 				    Typed
 
 	annotation PBI_ResultType = Table
+

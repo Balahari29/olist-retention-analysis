@@ -3,9 +3,9 @@
   "name": "43a68e4d544259fd8fc6",
   "position": {
     "x": 16,
-    "y": 226,
+    "y": 266,
     "z": 10000,
-    "height": 234,
+    "height": 215,
     "width": 616,
     "tabOrder": 10000
   },
@@ -27,25 +27,8 @@
                 }
               },
               "queryRef": "dim_date.year_month_label",
-              "nativeQueryRef": "year_month_label"
-            }
-          ]
-        },
-        "Y": {
-          "projections": [
-            {
-              "field": {
-                "Measure": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "_Measures"
-                    }
-                  },
-                  "Property": "On-Time %"
-                }
-              },
-              "queryRef": "_Measures.On-Time %",
-              "nativeQueryRef": "On-Time %"
+              "nativeQueryRef": "year_month_label",
+              "active": true
             }
           ]
         },
@@ -94,6 +77,24 @@
               "nativeQueryRef": "Avg Delivery Days"
             }
           ]
+        },
+        "Y": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "On-Time %"
+                }
+              },
+              "queryRef": "_Measures.On-Time %",
+              "nativeQueryRef": "On-Time %"
+            }
+          ]
         }
       },
       "sortDefinition": {
@@ -111,8 +112,7 @@
             },
             "direction": "Ascending"
           }
-        ],
-        "isDefaultSort": false
+        ]
       }
     },
     "objects": {

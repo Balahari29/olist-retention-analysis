@@ -3,9 +3,9 @@
   "name": "57df6ccd26b65bd9aa98",
   "position": {
     "x": 16,
-    "y": 226,
+    "y": 266,
     "z": 10000,
-    "height": 482,
+    "height": 442,
     "width": 816,
     "tabOrder": 10000
   },
@@ -13,25 +13,6 @@
     "visualType": "pivotTable",
     "query": {
       "queryState": {
-        "Rows": {
-          "projections": [
-            {
-              "field": {
-                "Column": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "dim_customer"
-                    }
-                  },
-                  "Property": "cohort_month"
-                }
-              },
-              "queryRef": "dim_customer.cohort_month",
-              "nativeQueryRef": "cohort_month",
-              "displayName": "Cohort (first order month)"
-            }
-          ]
-        },
         "Columns": {
           "projections": [
             {
@@ -47,7 +28,28 @@
               },
               "queryRef": "Cohort Month Offset.month_offset",
               "nativeQueryRef": "month_offset",
+              "active": true,
               "displayName": "Months since first order"
+            }
+          ]
+        },
+        "Rows": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "dim_customer"
+                    }
+                  },
+                  "Property": "cohort_month"
+                }
+              },
+              "queryRef": "dim_customer.cohort_month",
+              "nativeQueryRef": "cohort_month",
+              "active": true,
+              "displayName": "Cohort (first order month)"
             }
           ]
         },

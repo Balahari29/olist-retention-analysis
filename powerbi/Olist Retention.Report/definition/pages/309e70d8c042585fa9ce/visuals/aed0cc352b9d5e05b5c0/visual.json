@@ -3,9 +3,9 @@
   "name": "aed0cc352b9d5e05b5c0",
   "position": {
     "x": 16,
-    "y": 472,
+    "y": 493,
     "z": 12000,
-    "height": 236,
+    "height": 215,
     "width": 616,
     "tabOrder": 12000
   },
@@ -27,25 +27,8 @@
                 }
               },
               "queryRef": "dim_customer.customer_state",
-              "nativeQueryRef": "customer_state"
-            }
-          ]
-        },
-        "Y": {
-          "projections": [
-            {
-              "field": {
-                "Measure": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "_Measures"
-                    }
-                  },
-                  "Property": "Late %"
-                }
-              },
-              "queryRef": "_Measures.Late %",
-              "nativeQueryRef": "Late %"
+              "nativeQueryRef": "customer_state",
+              "active": true
             }
           ]
         },
@@ -94,6 +77,24 @@
               "nativeQueryRef": "Platform Late Rate"
             }
           ]
+        },
+        "Y": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "Late %"
+                }
+              },
+              "queryRef": "_Measures.Late %",
+              "nativeQueryRef": "Late %"
+            }
+          ]
         }
       },
       "sortDefinition": {
@@ -111,8 +112,7 @@
             },
             "direction": "Descending"
           }
-        ],
-        "isDefaultSort": false
+        ]
       }
     },
     "objects": {

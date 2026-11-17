@@ -2,11 +2,11 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
   "name": "f3c407eeea215c26aeb8",
   "position": {
-    "x": 348,
-    "y": 66,
+    "x": 328,
+    "y": 72,
     "z": 4000,
-    "height": 52,
-    "width": 200,
+    "height": 76,
+    "width": 300,
     "tabOrder": 4000
   },
   "visual": {
@@ -27,7 +27,8 @@
                 }
               },
               "queryRef": "dim_customer.customer_state",
-              "nativeQueryRef": "customer_state"
+              "nativeQueryRef": "customer_state",
+              "active": true
             }
           ]
         }
@@ -41,6 +42,19 @@
               "expr": {
                 "Literal": {
                   "Value": "'Dropdown'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "header": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
                 }
               }
             }
@@ -63,6 +77,13 @@
               "expr": {
                 "Literal": {
                   "Value": "'Customer state'"
+                }
+              }
+            },
+            "fontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "10D"
                 }
               }
             }

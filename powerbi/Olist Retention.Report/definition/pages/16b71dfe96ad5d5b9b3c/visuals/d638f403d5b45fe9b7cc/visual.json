@@ -3,9 +3,9 @@
   "name": "d638f403d5b45fe9b7cc",
   "position": {
     "x": 844,
-    "y": 472,
+    "y": 493,
     "z": 12000,
-    "height": 236,
+    "height": 215,
     "width": 420,
     "tabOrder": 12000
   },
@@ -27,7 +27,8 @@
                 }
               },
               "queryRef": "dim_customer.Order Count Band",
-              "nativeQueryRef": "Order Count Band"
+              "nativeQueryRef": "Order Count Band",
+              "active": true
             }
           ]
         },
@@ -65,8 +66,7 @@
             },
             "direction": "Ascending"
           }
-        ],
-        "isDefaultSort": false
+        ]
       }
     },
     "objects": {

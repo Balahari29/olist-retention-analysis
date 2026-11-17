@@ -3,9 +3,9 @@
   "name": "dab5b53a6baa5da1a363",
   "position": {
     "x": 644,
-    "y": 472,
+    "y": 493,
     "z": 13000,
-    "height": 236,
+    "height": 215,
     "width": 620,
     "tabOrder": 13000
   },
@@ -27,25 +27,8 @@
                 }
               },
               "queryRef": "fact_orders.delay_bucket",
-              "nativeQueryRef": "delay_bucket"
-            }
-          ]
-        },
-        "Y": {
-          "projections": [
-            {
-              "field": {
-                "Measure": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "_Measures"
-                    }
-                  },
-                  "Property": "Avg Review (delivered)"
-                }
-              },
-              "queryRef": "_Measures.Avg Review (delivered)",
-              "nativeQueryRef": "Avg Review (delivered)"
+              "nativeQueryRef": "delay_bucket",
+              "active": true
             }
           ]
         },
@@ -66,6 +49,24 @@
               "nativeQueryRef": "Delivered Orders"
             }
           ]
+        },
+        "Y": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "Avg Review (delivered)"
+                }
+              },
+              "queryRef": "_Measures.Avg Review (delivered)",
+              "nativeQueryRef": "Avg Review (delivered)"
+            }
+          ]
         }
       },
       "sortDefinition": {
@@ -83,8 +84,7 @@
             },
             "direction": "Ascending"
           }
-        ],
-        "isDefaultSort": false
+        ]
       }
     },
     "objects": {

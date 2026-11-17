@@ -3,9 +3,9 @@
   "name": "dcc18b8e61425a9f830f",
   "position": {
     "x": 644,
-    "y": 472,
+    "y": 493,
     "z": 14000,
-    "height": 236,
+    "height": 215,
     "width": 620,
     "tabOrder": 14000
   },
@@ -123,8 +123,7 @@
             },
             "direction": "Descending"
           }
-        ],
-        "isDefaultSort": false
+        ]
       }
     },
     "visualContainerObjects": {

@@ -29,22 +29,22 @@ table dim_customer
 
 	column customer_state
 		dataType: string
-		dataCategory: StateOrProvince
 		lineageTag: 1913b2af-6e56-57af-bb5b-9badbd07370b
+		dataCategory: StateOrProvince
 		summarizeBy: none
 		sourceColumn: customer_state
 
 	column customer_latitude
 		dataType: double
-		dataCategory: Latitude
 		lineageTag: c78099e2-df46-56d7-95cb-82fd6402c602
+		dataCategory: Latitude
 		summarizeBy: none
 		sourceColumn: customer_latitude
 
 	column customer_longitude
 		dataType: double
-		dataCategory: Longitude
 		lineageTag: 8c37b070-6519-5216-bc28-739f4a0f1d53
+		dataCategory: Longitude
 		summarizeBy: none
 		sourceColumn: customer_longitude
 
@@ -97,3 +97,4 @@ table dim_customer
 				    Typed
 
 	annotation PBI_ResultType = Table
+

@@ -3,9 +3,9 @@
   "name": "34a88ef9c92452c3bdd5",
   "position": {
     "x": 16,
-    "y": 226,
+    "y": 180,
     "z": 9000,
-    "height": 482,
+    "height": 528,
     "width": 616,
     "tabOrder": 9000
   },
@@ -27,25 +27,8 @@
                 }
               },
               "queryRef": "dim_date.year_month_label",
-              "nativeQueryRef": "year_month_label"
-            }
-          ]
-        },
-        "Y": {
-          "projections": [
-            {
-              "field": {
-                "Measure": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "_Measures"
-                    }
-                  },
-                  "Property": "Seller Late %"
-                }
-              },
-              "queryRef": "_Measures.Seller Late %",
-              "nativeQueryRef": "Seller Late %"
+              "nativeQueryRef": "year_month_label",
+              "active": true
             }
           ]
         },
@@ -80,6 +63,24 @@
               "nativeQueryRef": "Seller Delivered Orders"
             }
           ]
+        },
+        "Y": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "Seller Late %"
+                }
+              },
+              "queryRef": "_Measures.Seller Late %",
+              "nativeQueryRef": "Seller Late %"
+            }
+          ]
         }
       },
       "sortDefinition": {
@@ -97,8 +98,7 @@
             },
             "direction": "Ascending"
           }
-        ],
-        "isDefaultSort": false
+        ]
       }
     },
     "objects": {

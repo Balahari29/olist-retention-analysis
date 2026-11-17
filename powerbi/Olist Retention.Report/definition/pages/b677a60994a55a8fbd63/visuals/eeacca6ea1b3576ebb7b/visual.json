@@ -3,9 +3,9 @@
   "name": "eeacca6ea1b3576ebb7b",
   "position": {
     "x": 16,
-    "y": 472,
+    "y": 493,
     "z": 13000,
-    "height": 236,
+    "height": 215,
     "width": 616,
     "tabOrder": 13000
   },
@@ -27,7 +27,8 @@
                 }
               },
               "queryRef": "dim_product.category_english",
-              "nativeQueryRef": "category_english"
+              "nativeQueryRef": "category_english",
+              "active": true
             }
           ]
         },
@@ -83,8 +84,7 @@
             },
             "direction": "Descending"
           }
-        ],
-        "isDefaultSort": false
+        ]
       }
     },
     "visualContainerObjects": {
