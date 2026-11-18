@@ -3,6 +3,11 @@ These scripts generated `powerbi/Olist Retention.pbip` and its two folders (Stag
 be reproduced and re-checked. **Once you edit the report in Power BI Desktop, Desktop's saved files are the source of
 truth: re-running the generators overwrites those edits.**
 
+> **Warning: do not regenerate the report.** `build_report.py` still writes the original Stage 4 design. Running it can
+> overwrite the Navy Atlas backgrounds, manual visual styling, Back button formatting and all 31 KPI icon layers. Treat
+> the files in `powerbi/Olist Retention.Report/` as the source of truth, and restore from Git if the script is run by
+> mistake.
+
 | Script | What it does |
 |---|---|
 | `build_model.py <powerbi_dir>` | Writes `Olist Retention.SemanticModel/` (TMDL): 6 MySQL views, 7 relationships, 54 measures from `dax_measures.md`. No credentials. |
@@ -22,4 +27,4 @@ exact look of each visual.
 - **Refresh:** the model refreshed successfully from MySQL in Power BI Desktop; all 8 tables report a ready state.
 - **DAX checks:** `powerbi/stage5_validation.dax` passed 19 of 19 checks (0 failed). The rows returned by Power BI are
   saved in `outputs/stage5_validation_results.csv`.
-- **UAT:** Manual UAT is recorded in docs/05_UAT_checklist.md: 43 PASS, 0 Fail, 5 N/A, 3 checklist corrections outstanding.
+- **UAT:** Manual UAT is recorded in docs/05_UAT_checklist.md: 42 PASS, 0 Fail, 5 N/A, 3 checklist corrections outstanding, 1 retest required.

@@ -1,44 +1,44 @@
 {
   "name": "Olist Retention",
   "dataColors": [
-    "#2A78D6",
-    "#B5B4AF",
-    "#EB6834",
-    "#1B4F8C",
-    "#7FB2EB",
-    "#52514E",
-    "#F2A27F",
-    "#3F8F6B"
+    "#168C89",
+    "#4F6F8C",
+    "#E5A642",
+    "#54B8AD",
+    "#123B50",
+    "#8FA3B3",
+    "#8A5A0B",
+    "#0F6E6C"
   ],
-  "background": "#FFFFFF",
-  "foreground": "#0B0B0B",
-  "tableAccent": "#2A78D6",
-  "good": "#2A78D6",
-  "neutral": "#B5B4AF",
-  "bad": "#EB6834",
-  "maximum": "#2A78D6",
-  "center": "#9CC3EE",
-  "minimum": "#FFFFFF",
+  "background": "#F3F1E9",
+  "foreground": "#172B3A",
+  "tableAccent": "#168C89",
+  "good": "#168C89",
+  "neutral": "#4F6F8C",
+  "bad": "#E5A642",
+  "maximum": "#168C89",
+  "center": "#54B8AD",
+  "minimum": "#F3F1E9",
   "textClasses": {
     "title": {
       "fontFace": "Segoe UI Semibold",
       "fontSize": 12,
-      "color": "#0B0B0B"
+      "color": "#172B3A"
     },
     "header": {
       "fontFace": "Segoe UI Semibold",
       "fontSize": 12,
-      "color": "#0B0B0B"
+      "color": "#172B3A"
     },
     "label": {
       "fontFace": "Segoe UI",
       "fontSize": 10,
-      "color": "#52514E"
+      "color": "#4A5B68"
     },
     "callout": {
       "fontFace": "Segoe UI Semibold",
       "fontSize": 24,
-      "color": "#2A78D6"
+      "color": "#0A1F33"
     }
   },
   "visualStyles": {
@@ -49,10 +49,11 @@
             "show": true,
             "color": {
               "solid": {
-                "color": "#E3E2DE"
+                "color": "#D3D0C3"
               }
             },
-            "radius": 8
+            "radius": 8,
+            "width": 1
           }
         ],
         "background": [
@@ -60,7 +61,7 @@
             "show": true,
             "color": {
               "solid": {
-                "color": "#FFFFFF"
+                "color": "#F3F1E9"
               }
             },
             "transparency": 0
@@ -76,17 +77,90 @@
             "show": true,
             "fontColor": {
               "solid": {
-                "color": "#0B0B0B"
+                "color": "#172B3A"
               }
             },
-            "fontSize": 12
+            "fontSize": 12,
+            "fontFamily": "Segoe UI Semibold"
           }
         ],
         "subTitle": [
           {
             "fontColor": {
               "solid": {
-                "color": "#52514E"
+                "color": "#4A5B68"
+              }
+            },
+            "fontSize": 9
+          }
+        ],
+        "categoryAxis": [
+          {
+            "labelColor": {
+              "solid": {
+                "color": "#4A5B68"
+              }
+            },
+            "titleColor": {
+              "solid": {
+                "color": "#4A5B68"
+              }
+            },
+            "fontSize": 9,
+            "gridlineColor": {
+              "solid": {
+                "color": "#E3E0D5"
+              }
+            },
+            "gridlineStyle": "solid"
+          }
+        ],
+        "valueAxis": [
+          {
+            "labelColor": {
+              "solid": {
+                "color": "#4A5B68"
+              }
+            },
+            "titleColor": {
+              "solid": {
+                "color": "#4A5B68"
+              }
+            },
+            "fontSize": 9,
+            "gridlineColor": {
+              "solid": {
+                "color": "#E3E0D5"
+              }
+            },
+            "gridlineStyle": "solid"
+          }
+        ],
+        "y2Axis": [
+          {
+            "labelColor": {
+              "solid": {
+                "color": "#4A5B68"
+              }
+            },
+            "fontSize": 9
+          }
+        ],
+        "legend": [
+          {
+            "labelColor": {
+              "solid": {
+                "color": "#172B3A"
+              }
+            },
+            "fontSize": 9
+          }
+        ],
+        "labels": [
+          {
+            "color": {
+              "solid": {
+                "color": "#172B3A"
               }
             },
             "fontSize": 9

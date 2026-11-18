@@ -37,9 +37,159 @@
       "type": "RegisteredResources",
       "items": [
         {
+          "name": "navy-atlas-01-executive-overview.png",
+          "path": "navy-atlas-01-executive-overview.png",
+          "type": "Image"
+        },
+        {
+          "name": "navy-atlas-02-customer-retention.png",
+          "path": "navy-atlas-02-customer-retention.png",
+          "type": "Image"
+        },
+        {
+          "name": "navy-atlas-03-delivery-performance.png",
+          "path": "navy-atlas-03-delivery-performance.png",
+          "type": "Image"
+        },
+        {
+          "name": "navy-atlas-04-seller-performance.png",
+          "path": "navy-atlas-04-seller-performance.png",
+          "type": "Image"
+        },
+        {
+          "name": "navy-atlas-05-product-revenue.png",
+          "path": "navy-atlas-05-product-revenue.png",
+          "type": "Image"
+        },
+        {
+          "name": "navy-atlas-06-seller-detail.png",
+          "path": "navy-atlas-06-seller-detail.png",
+          "type": "Image"
+        },
+        {
           "name": "OlistTheme.json",
           "path": "OlistTheme.json",
           "type": "CustomTheme"
+        },
+        {
+          "name": "kpi-surface-198-alert-circle-teal.png",
+          "path": "kpi-surface-198-alert-circle-teal.png",
+          "type": "Image"
+        },
+        {
+          "name": "kpi-surface-198-clock-teal.png",
+          "path": "kpi-surface-198-clock-teal.png",
+          "type": "Image"
+        },
+        {
+          "name": "kpi-surface-198-package-check-teal.png",
+          "path": "kpi-surface-198-package-check-teal.png",
+          "type": "Image"
+        },
+        {
+          "name": "kpi-surface-198-plain.png",
+          "path": "kpi-surface-198-plain.png",
+          "type": "Image"
+        },
+        {
+          "name": "kpi-surface-198-star-teal.png",
+          "path": "kpi-surface-198-star-teal.png",
+          "type": "Image"
+        },
+        {
+          "name": "kpi-surface-198-triangle-amber.png",
+          "path": "kpi-surface-198-triangle-amber.png",
+          "type": "Image"
+        },
+        {
+          "name": "kpi-surface-240-alert-circle-teal.png",
+          "path": "kpi-surface-240-alert-circle-teal.png",
+          "type": "Image"
+        },
+        {
+          "name": "kpi-surface-240-award-teal.png",
+          "path": "kpi-surface-240-award-teal.png",
+          "type": "Image"
+        },
+        {
+          "name": "kpi-surface-240-basket-teal.png",
+          "path": "kpi-surface-240-basket-teal.png",
+          "type": "Image"
+        },
+        {
+          "name": "kpi-surface-240-cart-teal.png",
+          "path": "kpi-surface-240-cart-teal.png",
+          "type": "Image"
+        },
+        {
+          "name": "kpi-surface-240-clock-check-teal.png",
+          "path": "kpi-surface-240-clock-check-teal.png",
+          "type": "Image"
+        },
+        {
+          "name": "kpi-surface-240-clock-teal.png",
+          "path": "kpi-surface-240-clock-teal.png",
+          "type": "Image"
+        },
+        {
+          "name": "kpi-surface-240-package-check-teal.png",
+          "path": "kpi-surface-240-package-check-teal.png",
+          "type": "Image"
+        },
+        {
+          "name": "kpi-surface-240-package-teal.png",
+          "path": "kpi-surface-240-package-teal.png",
+          "type": "Image"
+        },
+        {
+          "name": "kpi-surface-240-pin-teal.png",
+          "path": "kpi-surface-240-pin-teal.png",
+          "type": "Image"
+        },
+        {
+          "name": "kpi-surface-240-receipt-teal.png",
+          "path": "kpi-surface-240-receipt-teal.png",
+          "type": "Image"
+        },
+        {
+          "name": "kpi-surface-240-repeat-teal.png",
+          "path": "kpi-surface-240-repeat-teal.png",
+          "type": "Image"
+        },
+        {
+          "name": "kpi-surface-240-store-teal.png",
+          "path": "kpi-surface-240-store-teal.png",
+          "type": "Image"
+        },
+        {
+          "name": "kpi-surface-240-triangle-amber.png",
+          "path": "kpi-surface-240-triangle-amber.png",
+          "type": "Image"
+        },
+        {
+          "name": "kpi-surface-240-truck-teal.png",
+          "path": "kpi-surface-240-truck-teal.png",
+          "type": "Image"
+        },
+        {
+          "name": "kpi-surface-240-user-check-teal.png",
+          "path": "kpi-surface-240-user-check-teal.png",
+          "type": "Image"
+        },
+        {
+          "name": "kpi-surface-240-user-teal.png",
+          "path": "kpi-surface-240-user-teal.png",
+          "type": "Image"
+        },
+        {
+          "name": "kpi-surface-240-users-teal.png",
+          "path": "kpi-surface-240-users-teal.png",
+          "type": "Image"
+        },
+        {
+          "name": "kpi-surface-240-wallet-teal.png",
+          "path": "kpi-surface-240-wallet-teal.png",
+          "type": "Image"
         }
       ]
     }

@@ -56,7 +56,7 @@ check the column's data type, then the relationship, then the DAX against `power
 | UAT-35 | 2.1 Review by delay bucket | Early / 7+ days late | 4.29 / 1.70 | `outputs/delivery_buckets_vs_review.csv` | Matches Expected (tester-reported) | PASS |
 | UAT-36 | 2.1 Review by delay bucket | Bucket order on the axis | Early, On time, 1-3, 4-7, 7+ days late | `outputs/delivery_buckets_vs_review.csv` | Matches Expected (tester-reported); axis sorts by `delay_bucket_order` | PASS |
 | UAT-37 | 2.3 Late % by state | AL / MA | 21.46% / 17.53% | `outputs/delivery_ontime_by_state.csv` | Matches Expected (tester-reported) | PASS |
-| UAT-38 | 2.3 Late % by state | Bars above platform average are orange, others blue | Rule applied | `powerbi/page_layout.md` colour rule | Matches Expected (tester-reported); colour measure `Colour - Late vs Platform` | PASS |
+| UAT-38 | 2.3 Late % by state | Bars above platform average are amber, others teal | Amber `#E5A642` above `[Platform Late Rate]`, teal `#168C89` at or below it | `powerbi/page_layout.md` colour rule | Rule matches all 27 states in `outputs/delivery_ontime_by_state.csv`; Desktop retest not recorded | Retest required |
 | UAT-39 | 2.4 Late % by category | audio (100+ orders filter on) | 11.85% | `outputs/delivery_late_by_category.csv` | Visual is not in the built report | N/A |
 | UAT-40 | 2.5 Distance bands | 0-100 / 1,500+ km | 4.49% / 11.64% | `outputs/distance_vs_delay_bands.csv` | Visual is not in the built report | N/A |
 | UAT-41 | 3.1 RFM segments | New - high value: % customers / % revenue | 15.56% / 29.40% | `outputs/rfm_segments.csv` | Visual is not in the built report | N/A |
@@ -78,10 +78,10 @@ check the column's data type, then the relationship, then the DAX against `power
 ## Sign-off
 | Total checks | Passed | Failed | Tester | Date |
 |---|---|---|---|---|
-| 51 | 43 | 0 | | |
+| 51 | 42 | 0 | | |
 
 ## Execution notes (recorded 2026-11-18)
-**Result:** 43 PASS, 0 Fail, 5 N/A, 3 Correction required. N/A and Correction required rows are not counted as passed.
+**Result:** 42 PASS, 0 Fail, 5 N/A, 3 Correction required, 1 Retest required. Only PASS rows are counted as passed.
 The Tester and Date cells in the sign-off stay blank for the tester to complete.
 
 **Build tested:** `powerbi/Olist Retention.pbip` (5 pages plus the hidden Seller Detail drill-through). The header
@@ -92,7 +92,7 @@ still names the original `.pbix`, and this checklist was written for the earlier
 |---|---|---|
 | Power BI query results in `outputs/stage5_validation_results.csv` (19 of 19 PASS) | UAT-01, UAT-13 to UAT-30 | The value returned by the model; **Actual** shows that value at the checklist's precision |
 | Model definition files in `powerbi/Olist Retention.SemanticModel/definition/` | UAT-11, UAT-12 | The saved relationship and date table settings |
-| Manual test in Power BI Desktop, reported as passed by the tester | UAT-02 to UAT-06, UAT-08, UAT-09, UAT-31 to UAT-38, UAT-42, UAT-44 to UAT-46, UAT-48 to UAT-50 | The tester's confirmation. The on-screen values and screenshots were not saved, so **Actual** does not repeat a number |
+| Manual test in Power BI Desktop, reported as passed by the tester | UAT-02 to UAT-06, UAT-08, UAT-09, UAT-31 to UAT-37, UAT-42, UAT-44 to UAT-46, UAT-48 to UAT-50 | The tester's confirmation. The on-screen values and screenshots were not saved, so **Actual** does not repeat a number |
 
 ### Where a passed check differs from its written location
 | ID | Written as | Tested in the built report |
@@ -114,9 +114,24 @@ still names the original `.pbix`, and this checklist was written for the earlier
 |---|---|---|---|
 | UAT-07 | N/A | `rfm_customer_segments` is not one of the model's tables | RFM stays outside the dashboard; results remain in `outputs/rfm_segments.csv` |
 | UAT-10 | Correction required | Relationships R1, R2, R4, R5, R6 and R8 are active, R7 is inactive, and R3 is not built because it joins the RFM table | Change Expected to "6 active + R7 inactive, all Many to one, Single", then retest |
+| UAT-38 | Retest required | The colour rule changed to amber and teal after the manual test | Confirm the bars in Power BI Desktop and record the result |
 | UAT-39 | N/A | No Late % by category visual | Results remain in `outputs/delivery_late_by_category.csv` |
 | UAT-40 | N/A | No distance band visual or table | Results remain in `outputs/distance_vs_delay_bands.csv` |
 | UAT-41 | N/A | No RFM visual | Results remain in `outputs/rfm_segments.csv` |
 | UAT-43 | N/A | No first-order test visual | Results remain in `outputs/retention_first_order_late_vs_on_time.csv` |
 | UAT-47 | Correction required | Visuals 2.5, 3.2 and 3.5 are not built. The cohort matrix uses a live measure that ignores the date slicer but not the customer state slicer, and its subtitle reads "the date slicer does not apply" | Rewrite the check for the cohort matrix and the date slicer only, then retest |
 | UAT-51 | Correction required | Only "What this seller ships" matches `page_layout.md`. Most built titles describe the visual, and 6 subtitles state a finding | Compare titles with the built report instead of `page_layout.md`, then retest |
+
+### Visual retest after Navy Atlas styling (recorded 2026-11-18)
+The Navy Atlas backgrounds, visual styling, Back button and KPI icon layers were applied after the manual UAT above.
+**No post-styling Power BI Desktop retest results or screenshots have been saved**, so no check below is recorded as
+retested. The tester reported that the backgrounds looked good and that Seller Detail looked good apart from the Back
+button, which was restyled afterwards. PASS results above describe the build tested before this styling.
+
+| Checks | What changed | File-based evidence | Desktop retest |
+|---|---|---|---|
+| UAT-31 to UAT-37, UAT-42, UAT-44, UAT-45 | Colours and formatting only | Fields, filters, sort order and positions match commit `194d2b5` | Not recorded |
+| UAT-38 | Rule shown as amber and teal instead of orange and blue | Colour rule matches all 27 states in `outputs/delivery_ontime_by_state.csv` | **Required** |
+| UAT-46, UAT-48 | Slicers restyled | Slicer fields and modes match commit `194d2b5` | Not recorded |
+| UAT-49, UAT-50 | Seller Detail cards and Back button restyled | Drill-through binding and Back action are unchanged | Not recorded |
+| 31 KPI cards | Decorative layers added behind transparent cards | Report validator verifies all 31 layers | Not recorded |

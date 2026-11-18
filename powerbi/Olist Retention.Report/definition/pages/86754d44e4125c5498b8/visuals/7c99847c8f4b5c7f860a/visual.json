@@ -23,7 +23,7 @@
                     "textStyle": {
                       "fontWeight": "bold",
                       "fontSize": "18pt",
-                      "color": "#0B0B0B"
+                      "color": "#172B3A"
                     }
                   }
                 ]
@@ -34,7 +34,7 @@
                     "value": "Ranked sellers = 30+ delivered orders; rates use seller-order pairs",
                     "textStyle": {
                       "fontSize": "10pt",
-                      "color": "#52514E"
+                      "color": "#4A5B68"
                     }
                   }
                 ]

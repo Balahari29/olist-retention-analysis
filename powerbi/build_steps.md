@@ -111,11 +111,28 @@ alphabetically (April, August, December…).
 
 *Why:* building visuals on a wrong measure hides the error. Checking against SQL first is a mini-UAT.
 
-## Step 8: Apply the colour theme
+## Step 8: Apply the Navy Atlas colour theme
+The finished report already contains this theme in `Olist Retention.Report/StaticResources/RegisteredResources/OlistTheme.json`.
+Use these settings only when rebuilding a report by hand.
+
 **View → Themes → Customize current theme → Name and colors**:
-- *Theme colors*: **Color 1 `#2A78D6`** (blue, default), **Color 2 `#B5B4AF`** (grey, context)
-- *Sentiment colors*: **Bad `#EB6834`** (orange), the only highlight colour (see `page_layout.md`)
+- *Theme colors*: **Color 1 `#168C89`** (Primary Teal), **Color 2 `#4F6F8C`** (Muted Blue), **Color 3 `#E5A642`** (Warning Amber)
+- *Sentiment colors*: **Good `#168C89`**, **Neutral `#4F6F8C`**, **Bad `#E5A642`**
 - **Apply**.
+
+| Use | Colour |
+|---|---|
+| Main measures and favourable results | Primary Teal `#168C89` |
+| Late delivery and performance worse than the platform | Warning Amber `#E5A642` |
+| Risk text and risk icons on light surfaces | Dark Amber `#8A5A0B` |
+| Secondary comparison lines | Muted Blue `#4F6F8C` |
+| Selected page button, with white text | Selected Teal `#127C79` |
+| Cards, charts and slicers | Warm White `#F3F1E9` |
+| Page canvas and KPI values | Deep Navy `#0A1F33` |
+| Table headers and labels | Dark Teal `#123B50` |
+| Titles and data labels | Text `#172B3A` |
+
+See the colour rule in `page_layout.md` for where each colour applies.
 
 ## Step 9: Build page 1, Executive Overview (in full detail)
 1. Double-click the tab **Page 1** → rename to **Executive Overview**.
@@ -131,7 +148,7 @@ alphabetically (April, August, December…).
    Title: "Black Friday 2017 lifted revenue 52% in one month".
 6. **On-time by month (1.7):** **Line chart** → *X-axis* `year_month_label`, *Y-axis* `[On-Time %]`. Format → Markers
    **On**. To highlight March 2018: click its marker → **Format → Markers → Apply settings to: Series / Categories**
-   → pick 2018-03 → colour **#EB6834**. Title: "On-time delivery fell to 81% in March 2018".
+   → pick 2018-03 → colour **Warning Amber `#E5A642`**. Title: "On-time delivery fell to 81% in March 2018".
 7. **Top 10 states by revenue (1.8):** **Clustered bar chart** → *Y-axis* `dim_customer[customer_state]`, *X-axis*
    `[Total Revenue (R$)]`. In the **Filters** pane, expand `customer_state` on *this visual* → *Filter type* **Top N**
    → *Show items* **Top 10** → *By value*: drag `[Total Revenue (R$)]` → **Apply filter**. Data labels **On**.
@@ -149,12 +166,14 @@ as a sentence with a finding.
 Use `page_layout.md` (one row per visual: type, fields, title). Two techniques you will need:
 
 **Colour bars by "worse than platform" (2.3, 2.4, 4.1):** select the visual → **Format visual → Bars → Colors → fx**
-→ *Format style* **Field value** → *What field should we base this on?* `Colour - Late vs Platform`
-(or `Colour - Seller Late vs Platform`) → **OK**. Bars above the platform late rate turn orange.
+→ *Format style* **Rules** → *What field should we base this on?* `Colour - Late vs Platform`
+(or `Colour - Seller Late vs Platform`). Add one rule that shows the measure's risk result in **Warning Amber
+`#E5A642`** and one that shows its favourable result in **Primary Teal `#168C89`** → **OK**. Bars above the platform late
+rate turn amber, and all other bars stay teal. The measure values used by these rules are listed in `page_layout.md`.
 
 **Reference line at the platform average (2.3, 4.2):** select the visual → **Analytics** pane (magnifying-glass icon)
 → **Constant line** (*X-axis constant line* on bar charts) → **Add** → *Value* **fx** → `[Platform Late Rate]` →
-colour grey, *Data label* **On**.
+colour **Muted Blue `#4F6F8C`**, *Data label* **On**.
 
 **Visual-level filter for sellers (page 4):** select each visual → **Filters** pane → *Filters on this visual* → drag
 `dim_seller[is_ranked_30plus_orders]` → tick **1**.

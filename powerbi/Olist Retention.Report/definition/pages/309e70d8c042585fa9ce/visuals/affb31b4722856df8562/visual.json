@@ -95,13 +95,63 @@
               "solid": {
                 "color": {
                   "expr": {
-                    "Measure": {
-                      "Expression": {
-                        "SourceRef": {
-                          "Entity": "_Measures"
+                    "Conditional": {
+                      "Cases": [
+                        {
+                          "Condition": {
+                            "Comparison": {
+                              "ComparisonKind": 0,
+                              "Left": {
+                                "Measure": {
+                                  "Expression": {
+                                    "SourceRef": {
+                                      "Entity": "_Measures"
+                                    }
+                                  },
+                                  "Property": "Colour - Late Bucket"
+                                }
+                              },
+                              "Right": {
+                                "Literal": {
+                                  "Value": "'#EB6834'"
+                                }
+                              }
+                            }
+                          },
+                          "Value": {
+                            "Literal": {
+                              "Value": "'#E5A642'"
+                            }
+                          }
+                        },
+                        {
+                          "Condition": {
+                            "Comparison": {
+                              "ComparisonKind": 0,
+                              "Left": {
+                                "Measure": {
+                                  "Expression": {
+                                    "SourceRef": {
+                                      "Entity": "_Measures"
+                                    }
+                                  },
+                                  "Property": "Colour - Late Bucket"
+                                }
+                              },
+                              "Right": {
+                                "Literal": {
+                                  "Value": "'#2A78D6'"
+                                }
+                              }
+                            }
+                          },
+                          "Value": {
+                            "Literal": {
+                              "Value": "'#168C89'"
+                            }
+                          }
                         }
-                      },
-                      "Property": "Colour - Late Bucket"
+                      ]
                     }
                   }
                 }
@@ -126,6 +176,17 @@
               "expr": {
                 "Literal": {
                   "Value": "true"
+                }
+              }
+            },
+            "color": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#172B3A'"
+                    }
+                  }
                 }
               }
             }
@@ -167,7 +228,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Delivered date vs estimated date; orange = late'"
+                  "Value": "'Delivered date vs estimated date; amber = late'"
                 }
               }
             }
