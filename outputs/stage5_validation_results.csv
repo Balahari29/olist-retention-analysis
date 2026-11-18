@@ -1,0 +1,20 @@
+Check,Measure,Context,Power BI,SQL expected,Tolerance,Detail,Difference,Result
+1,Total Revenue (R$),all valid orders 2017-01 to 2018-08,13449529.68,13449529.68,0.005,,0,PASS
+2,Orders,all,97905,97905,0,,0,PASS
+3,AOV (R$),all,137.3733,137.3733,5E-05,,0,PASS
+4,Customers,all (distinct customer_unique_id),94703,94703,0,,0,PASS
+5,Repeat Customer %,all,3.0347507470724264,3.0348,5E-05,,-4.9252927573739669E-05,PASS
+6,Delivered Orders (in scope),all,96201,96201,0,,0,PASS
+7,On-Time %,all,93.2110892818162,93.2111,5E-05,,-1.0718183801827763E-05,PASS
+8,Late %,all,6.7889107181838018,6.7889,5E-05,,1.0718183801827763E-05,PASS
+9,Avg Delay (days),all (negative = early),-11.807060217669255,-11.8071,5E-05,,3.9782330745197214E-05,PASS
+10,Avg Delivery Days,all,12.47675180091683,12.4768,5E-05,,-4.8199083170885615E-05,PASS
+11,Avg Review,all valid orders with a review,4.117320792772027,4.1173,5E-05,,2.0792772026823059E-05,PASS
+12,Avg Review (delivered),orders in delivery scope with a review,4.156302978295904,4.1563,5E-05,,2.978295904121353E-06,PASS
+13,Revenue MoM %,month = 2018-08 (vs 2018-07),-3.3237697684650911,-3.3238,5E-05,,3.0231534908775615E-05,PASS
+14,Revenue MoM %,month = 2017-11 (vs 2017-10),52.05894117119216,52.0589,5E-05,,4.1171192158628855E-05,PASS
+15,Excess Late Orders,sellers with 30+ delivered orders (is_ranked_30plus_orders = 1),-45.413665138615563,-45.41,0.005,,-0.003665138615566832,PASS
+16,Excess Late Orders,top seller by excess (rank 1),51.700502073783028,51.7,0.005,Expected seller 4a3ca9315b744ce9f8e9374361493884; Power BI top seller: 4a3ca9315b744ce9f8e9374361493884,0.00050207378302502548,PASS
+17,Seller Late %,sellers with 30+ delivered orders (seller-order pairs),6.7331425834735308,6.7331,5E-05,,4.2583473530477534E-05,PASS
+18,Platform Late Rate,no filters (equals overall Late %),6.7889107181838018,6.7889,5E-05,,1.0718183801827763E-05,PASS
+19,Platform Late Rate,customer state SP and month 2018-03 (must not change),6.7889107181838018,6.7889,5E-05,Late % with these filters: 9.4244,1.0718183801827763E-05,PASS
